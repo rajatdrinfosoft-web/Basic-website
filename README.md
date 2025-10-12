@@ -13,6 +13,7 @@ Files (main)
   - A compact internal `<style>` block for small site-specific styles and utilities.
   - Site content: navbar, hero/header, carousels, cards, contact form, about and footer.
   - Bootstrap JS bundle at the end of the body.
+- `index-progressive.html` — added: progressive image demo using LQIP (blur-up), <picture> with WebP/AVIF sources and a small IntersectionObserver loader. Use this to compare progressive loading patterns with the baseline.
 - `img/` — (local images referenced by `index.html`).
 
 Key decisions & how they map to files
@@ -67,6 +68,11 @@ Run / Test locally
 2. For a simple local server (recommended to preserve relative URLs and avoid CORS when testing):
    - Python 3: `python -m http.server 8000` (from the project directory), then open http://localhost:8000/
    - Node: `npx serve .`
+
+How to test the progressive demo
+1. Open `index-progressive.html` in a browser or run a local static server (recommended).
+2. Observe hero and key card images: a tiny placeholder is shown immediately, full responsive image loads and the blur is removed when the image finishes loading.
+3. For production use: generate WebP/AVIF variants and optionally progressive JPEGs on the server.
 
 Suggested next steps
 - Move the internal `<style>` into `assets/css/site.css` when styles grow.
