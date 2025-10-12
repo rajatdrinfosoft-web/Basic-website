@@ -18,7 +18,10 @@
     <meta property="og:image" content=".\img\logo.png">
     <link rel="canonical" href="http://www.pilgrimpackages.com/">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#e0e7ff">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -35,46 +38,95 @@
       }
     }
     </script>
+
+    <!-- minimal internal CSS (moved from inline styles) -->
     <style>
+        :root { --accent: #0d6efd; }
+
+        /* page base */
         body {
             font-family: 'Montserrat', sans-serif;
             background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
             color: #222;
+            padding-top: 80px; /* space for fixed navbar */
         }
 
-        .carousel-img {
+        /* navbar subtle separator */
+        nav.navbar { border-bottom: 1px solid rgba(11,18,32,0.06); }
+
+        /* header visuals previously inline */
+        header.bg-primary-subtle {
+            position: relative;
+            background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(240,248,255,0.6));
+            padding: 3.5rem 0;
+            box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+            border-bottom: 1px solid rgba(11,18,32,0.04);
+        }
+        header h1 {
+            font-size: clamp(1.6rem, 3.5vw, 3rem);
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            color: #0b1220;
+        }
+        header .lead {
+            color: #1f2937;
+            font-size: clamp(0.95rem, 1.8vw, 1.25rem);
+            line-height: 1.45;
+        }
+
+        /* carousel images */
+        #carouselExampleAutoplaying .carousel-item img {
             max-height: 350px;
-            width: auto;
-            margin: 0 auto;
             object-fit: cover;
-            display: block;
+            width: 100%;
         }
 
-        .nav-item.dropdown:hover .dropdown-menu {
-            display: block;
-            margin-top: 0;
-            /* remove gap between toggle and menu */
+        /* about image */
+        .about-img {
+            height: 500px;
+            object-fit: cover;
+            width: 100%;
         }
 
-        /* Optional: smooth fade-in effect */
-        .dropdown-menu {
-            transition: opacity 0.2s ease;
-            opacity: 0;
-            visibility: hidden;
+        /* small utilities */
+        .nav-logo { height: 70px; border-radius: 16px; }
+        .event-card { width: 15rem; }
+
+        /* back-to-top placement */
+        .back-to-top { right: 1rem; bottom: 1rem; z-index: 1050; }
+
+        /* accessible skip link */
+        .visually-hidden-focusable {
+            position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+        }
+        .visually-hidden-focusable:focus {
+            position: fixed; left: 1rem; top: 1rem; width: auto; height: auto; padding: 0.5rem 0.75rem; background: #fff; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 6px 18px rgba(16,24,40,0.06); z-index: 1100; clip: auto; white-space: normal;
         }
 
-        .nav-item.dropdown:hover .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
+        /* Hover dropdown: only on devices that support hover (desktop) */
+        @media (hover: hover) and (pointer: fine) {
+            /* show dropdown menu on hover */
+            .navbar .dropdown:hover > .dropdown-menu {
+                display: block;
+                margin-top: 0; /* remove gap */
+            }
+            /* keep dropdown toggle accessible styling when hovered */
+            .navbar .dropdown:hover > .nav-link,
+            .navbar .dropdown:hover > .dropdown-toggle {
+                color: inherit;
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- Skip link for keyboard users -->
+    <a class="visually-hidden-focusable" href="#main-content">Skip to main content</a>
+
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="./index.html">
-                <img src="img/logo.png" alt="Logo" class="me-2" style="height: 70px; border-radius: 16px" />
+                <img src="img/logo.png" alt="Logo" class="me-2 nav-logo" loading="lazy" />
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +134,7 @@
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Home</a></li>
                     <!-- Destinations nev -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -117,12 +169,11 @@
         </div>
     </nav>
 
-    <header class="bg-primary-subtle text-dark text-center py-5 mb-4 rounded-bottom">
+    <header class="bg-primary-subtle text-dark text-center mb-4 rounded-bottom">
         <div class="container">
             <h1 class="fw-bold">Welcome to Pilgrim Packages</h1>
             <p class="lead">Affordable Tour Packages for Spiritual Journeys Across India</p>
-            <p>Explore sacred destinations with comfort and ease. Our expertly curated pilgrimage tours connect you to
-                India’s rich spiritual heritage.</p>
+            <p>Explore sacred destinations with comfort and ease. Our expertly curated pilgrimage tours connect you to India’s rich spiritual heritage.</p>
         </div>
     </header>
 
@@ -130,13 +181,13 @@
         <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img src="img/1.png" class="d-block mx-auto w-100 carousel-img" alt="...">
+                    <img src="img/1.png" class="d-block mx-auto w-100" alt="..." loading="eager">
                 </div>
                 <div class="carousel-item">
-                    <img src="img/3.png" class="d-block mx-auto w-100 carousel-img" alt="...">
+                    <img src="img/3.png" class="d-block mx-auto w-100" alt="..." loading="lazy">
                 </div>
                 <div class="carousel-item">
-                    <img src="img/4.png" class="d-block mx-auto w-100 carousel-img" alt="...">
+                    <img src="img/4.png" class="d-block mx-auto w-100" alt="..." loading="lazy">
                 </div>
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
@@ -163,8 +214,7 @@
             <div class="col">
                 <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                     <div class="card h-100">
-                        <img src="https://www.pilgrimpackages.com/upload/package/image-D33QMAIRU7N7HFIV.jpg"
-                            class="card-img-top" alt="Amarnath Yatra">
+                        <img src="https://www.pilgrimpackages.com/upload/package/image-D33QMAIRU7N7HFIV.jpg" class="card-img-top" alt="Amarnath Yatra" loading="lazy">
                         <div class="card-body">
                             <h5 class="card-title text-primary">Amarnath Yatra by Helicopter </h5>
                             <p class="card-text">A 6-day 5-Nights spiritual journey to the sacred Amarnath cave</p>
@@ -177,8 +227,7 @@
             <div class="col">
                 <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                     <div class="card h-100">
-                        <img src="https://www.pilgrimpackages.com/upload/package/image-I7M71G3KC0J1HWZH.jpg"
-                            class="card-img-top" alt="Char Dham Yatra">
+                        <img src="https://www.pilgrimpackages.com/upload/package/image-I7M71G3KC0J1HWZH.jpg" class="card-img-top" alt="Char Dham Yatra" loading="lazy">
                         <div class="card-body">
                             <h5 class="card-title text-primary">Kailash Mansarovar Yatra Ex Kathmandu by Road</h5>
                             <p class="card-text">The 10-day Kailash Mansarovar Yatra offers a soul-stirring journey
@@ -192,8 +241,7 @@
             <div class="col">
                 <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                     <div class="card h-100">
-                        <img src="https://www.pilgrimpackages.com/upload/package/image-MS3XW2M4WJJB33C2.jpg"
-                            class="card-img-top" alt="Golden Temple Tour">
+                        <img src="https://www.pilgrimpackages.com/upload/package/image-MS3XW2M4WJJB33C2.jpg" class="card-img-top" alt="Golden Temple Tour" loading="lazy">
                         <div class="card-body">
                             <h5 class="card-title text-primary">Golden Temple Tour</h5>
                             <p class="card-text">A 3-day visit to the iconic Golden Temple in Amritsar, a spiritual
@@ -224,7 +272,7 @@
                     <div class="carousel-item active">
                         <div class="d-flex justify-content-center gap-3">
                             <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
-                                <div class="card" style="width: 15rem;">
+                                <div class="card event-card">
                                     <img src="https://www.pilgrimpackages.com/upload/package/image-Q178D7067V0TP584.jpg"
                                         class="card-img-top" alt="...">
                                     <div class="card-body">
@@ -236,7 +284,7 @@
                             </a>
 
                             <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
-                                <div class="card" style="width: 15rem;">
+                                <div class="card event-card">
                                     <img src="https://www.pilgrimpackages.com/upload/package/image-DVCAJ138GXX7BTD0.jpg"
                                         class="card-img-top" alt="...">
                                     <div class="card-body">
@@ -248,7 +296,7 @@
                             </a>
 
                             <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
-                                <div class="card" style="width: 15rem;">
+                                <div class="card event-card">
                                     <img src="https://www.pilgrimpackages.com/upload/package/image-D0AJWIWGNTX4K1KC.jpg"
                                         class="card-img-top" alt="...">
                                     <div class="card-body">
@@ -260,7 +308,7 @@
                             </a>
 
                             <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
-                                <div class="card" style="width: 15rem;">
+                                <div class="card event-card">
                                     <img src="https://www.pilgrimpackages.com/upload/package/image-UVG7R915YQWCMOX4.jpg"
                                         class="card-img-top" alt="...">
                                     <div class="card-body">
@@ -277,7 +325,7 @@
                     <div class="carousel-item">
                         <div class="d-flex justify-content-center gap-3">
                             <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
-                                <div class="card" style="width: 15rem;">
+                                <div class="card event-card">
                                     <img src="https://www.pilgrimpackages.com/upload/package/image-F4FQ2Y8U1WP4SVI3.jpg"
                                         class="card-img-top" alt="...">
                                     <div class="card-body">
@@ -289,7 +337,7 @@
                             </a>
 
                             <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
-                                <div class="card" style="width: 15rem;">
+                                <div class="card event-card">
                                     <img src="https://www.pilgrimpackages.com/upload/package/image-I7M71G3KC0J1HWZH.jpg"
                                         class="card-img-top" alt="...">
                                     <div class="card-body">
@@ -301,7 +349,7 @@
                             </a>
 
                             <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
-                                <div class="card" style="width: 15rem;">
+                                <div class="card event-card">
                                     <img src="https://www.pilgrimpackages.com/upload/package/image-A8YRCHJ0RQZGTI0H.jpg"
                                         class="card-img-top" alt="...">
                                     <div class="card-body">
@@ -312,7 +360,7 @@
                                 </div>
                             </a>
                             <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
-                                <div class="card" style="width: 15rem;">
+                                <div class="card event-card">
                                     <img src="https://www.pilgrimpackages.com/upload/package/image-CR865JBG861GVC9P.jpg"
                                         class="card-img-top" alt="...">
                                     <div class="card-body">
@@ -364,14 +412,14 @@
     </section>
 
 
-    <main>
+    <main id="main-content">
         <div class="container" id="Packeges">
             <h2 class="text-center bg-primary-subtle text-dark py-3">Spiritual & Pilgrimage Tour Packages in India</h2>
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div class="col">
                     <a href="" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/1.png" class="card-img-top" alt="Abstract Art">
+                            <img src="img/1.png" class="card-img-top" alt="Abstract Art" loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Place 1</h5>
                                 <p class="card-text">Find many things in this area. </p>
@@ -387,7 +435,7 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src=".\img\2.png" class="card-img-top" alt="Nature Landscape">
+                            <img src=".\img\2.png" class="card-img-top" alt="Nature Landscape" loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Place 2</h5>
                                 <p class="card-text">A serene view of mountains and lakes, bringing calm to your day.
@@ -403,7 +451,7 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/3.png" class="card-img-top" alt="Digital Pattern">
+                            <img src="img/3.png" class="card-img-top" alt="Digital Pattern" loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Place 3</h5>
                                 <p class="card-text">Char Dham tour in Bus</p>
@@ -418,7 +466,7 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/4.png" class="card-img-top" alt="Minimalist Design">
+                            <img src="img/4.png" class="card-img-top" alt="Minimalist Design" loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Place 4</h5>
                                 <p class="card-text">Tample in Dwarka</p>
@@ -433,7 +481,7 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/5.png" class="card-img-top" alt="Creative Doodle">
+                            <img src="img/5.png" class="card-img-top" alt="Creative Doodle" loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Place 5</h5>
                                 <p class="card-text">Nothing to say ,i </p>
@@ -448,7 +496,7 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/cartoon.jpg" class="card-img-top" alt="Cartoon Character">
+                            <img src="img/cartoon.jpg" class="card-img-top" alt="Cartoon Character" loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Cartoon Character</h5>
                                 <p class="card-text">A lively cartoon character, perfect for kids’ projects.</p>
@@ -463,7 +511,7 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/generated-image (7).png" class="card-img-top" alt="AI Generated Art">
+                            <img src="img/generated-image (7).png" class="card-img-top" alt="AI Generated Art" loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">AI Generated Art</h5>
                                 <p class="card-text">Unique artwork created by artificial intelligence.</p>
@@ -478,7 +526,7 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/generated-image copy.png" class="card-img-top" alt="Modern Illustration">
+                            <img src="img/generated-image copy.png" class="card-img-top" alt="Modern Illustration" loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Modern Illustration</h5>
                                 <p class="card-text">A stylish illustration for contemporary design needs.</p>
@@ -492,7 +540,7 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/generated-image.jpeg" class="card-img-top" alt="Photo Realistic">
+                            <img src="img/generated-image.jpeg" class="card-img-top" alt="Photo Realistic" loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Photo Realistic</h5>
                                 <p class="card-text">A photo-realistic image with stunning detail and clarity.</p>
@@ -519,7 +567,7 @@
 
                 <div class="col-lg-6 mb-4 mb-lg-0">
                     <img src="https://www.pilgrimpackages.com/upload/homepage/image-Q2AX0TZ8DBTXXT0R.jpg" alt="About Us"
-                        class="img-fluid rounded shadow" style="height: 500px; object-fit: cover; width: 100%;" />
+                        class="img-fluid rounded shadow about-img" />
                 </div>
 
                 <div class="col-lg-6">
@@ -596,6 +644,7 @@
         </div>
     </footer>
 
+    <!-- Small scripts: removed custom JS functions (external-link safety, form demo, back-to-top, dropdown handlers) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
