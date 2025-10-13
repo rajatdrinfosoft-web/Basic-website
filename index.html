@@ -41,33 +41,40 @@
 
     <!-- minimal internal CSS (moved from inline styles) -->
     <style>
-        :root { --accent: #0d6efd; }
+        :root {
+            --accent: #0d6efd;
+        }
 
         /* page base */
         body {
             font-family: 'Montserrat', sans-serif;
             background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
             color: #222;
-            padding-top: 80px; /* space for fixed navbar */
+            padding-top: 80px;
+            /* space for fixed navbar */
         }
 
         /* navbar subtle separator */
-        nav.navbar { border-bottom: 1px solid rgba(11,18,32,0.06); }
+        nav.navbar {
+            border-bottom: 1px solid rgba(11, 18, 32, 0.06);
+        }
 
         /* header visuals previously inline */
         header.bg-primary-subtle {
             position: relative;
-            background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(240,248,255,0.6));
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(240, 248, 255, 0.6));
             padding: 3.5rem 0;
-            box-shadow: 0 6px 18px rgba(16,24,40,0.06);
-            border-bottom: 1px solid rgba(11,18,32,0.04);
+            box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+            border-bottom: 1px solid rgba(11, 18, 32, 0.04);
         }
+
         header h1 {
             font-size: clamp(1.6rem, 3.5vw, 3rem);
             letter-spacing: 0.5px;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
             color: #0b1220;
         }
+
         header .lead {
             color: #1f2937;
             font-size: clamp(0.95rem, 1.8vw, 1.25rem);
@@ -89,30 +96,62 @@
         }
 
         /* small utilities */
-        .nav-logo { height: 70px; border-radius: 16px; }
-        .event-card { width: 15rem; }
+        .nav-logo {
+            height: 70px;
+            border-radius: 16px;
+        }
+
+        .event-card {
+            width: 15rem;
+        }
 
         /* back-to-top placement */
-        .back-to-top { right: 1rem; bottom: 1rem; z-index: 1050; }
+        .back-to-top {
+            right: 1rem;
+            bottom: 1rem;
+            z-index: 1050;
+        }
 
         /* accessible skip link */
         .visually-hidden-focusable {
-            position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+            position: absolute;
+            left: -9999px;
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
         }
+
         .visually-hidden-focusable:focus {
-            position: fixed; left: 1rem; top: 1rem; width: auto; height: auto; padding: 0.5rem 0.75rem; background: #fff; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 6px 18px rgba(16,24,40,0.06); z-index: 1100; clip: auto; white-space: normal;
+            position: fixed;
+            left: 1rem;
+            top: 1rem;
+            width: auto;
+            height: auto;
+            padding: 0.5rem 0.75rem;
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+            z-index: 1100;
+            clip: auto;
+            white-space: normal;
         }
 
         /* Hover dropdown: only on devices that support hover (desktop) */
         @media (hover: hover) and (pointer: fine) {
+
             /* show dropdown menu on hover */
-            .navbar .dropdown:hover > .dropdown-menu {
+            .navbar .dropdown:hover>.dropdown-menu {
                 display: block;
-                margin-top: 0; /* remove gap */
+                margin-top: 0;
+                /* remove gap */
             }
+
             /* keep dropdown toggle accessible styling when hovered */
-            .navbar .dropdown:hover > .nav-link,
-            .navbar .dropdown:hover > .dropdown-toggle {
+            .navbar .dropdown:hover>.nav-link,
+            .navbar .dropdown:hover>.dropdown-toggle {
                 color: inherit;
             }
         }
@@ -121,7 +160,7 @@
 
 <body>
     <!-- Skip link for keyboard users -->
-    <a class="visually-hidden-focusable" href="#main-content">Skip to main content</a>
+    <!-- <a class="visually-hidden-focusable" href="#main-content">Skip to main content</a> -->
 
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
@@ -173,7 +212,8 @@
         <div class="container">
             <h1 class="fw-bold">Welcome to Pilgrim Packages</h1>
             <p class="lead">Affordable Tour Packages for Spiritual Journeys Across India</p>
-            <p>Explore sacred destinations with comfort and ease. Our expertly curated pilgrimage tours connect you to India’s rich spiritual heritage.</p>
+            <p>Explore sacred destinations with comfort and ease. Our expertly curated pilgrimage tours connect you to
+                India’s rich spiritual heritage.</p>
         </div>
     </header>
 
@@ -214,7 +254,8 @@
             <div class="col">
                 <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                     <div class="card h-100">
-                        <img src="https://www.pilgrimpackages.com/upload/package/image-D33QMAIRU7N7HFIV.jpg" class="card-img-top" alt="Amarnath Yatra" loading="lazy">
+                        <img src="https://www.pilgrimpackages.com/upload/package/image-D33QMAIRU7N7HFIV.jpg"
+                            class="card-img-top" alt="Amarnath Yatra" loading="lazy">
                         <div class="card-body">
                             <h5 class="card-title text-primary">Amarnath Yatra by Helicopter </h5>
                             <p class="card-text">A 6-day 5-Nights spiritual journey to the sacred Amarnath cave</p>
@@ -227,7 +268,8 @@
             <div class="col">
                 <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                     <div class="card h-100">
-                        <img src="https://www.pilgrimpackages.com/upload/package/image-I7M71G3KC0J1HWZH.jpg" class="card-img-top" alt="Char Dham Yatra" loading="lazy">
+                        <img src="https://www.pilgrimpackages.com/upload/package/image-I7M71G3KC0J1HWZH.jpg"
+                            class="card-img-top" alt="Char Dham Yatra" loading="lazy">
                         <div class="card-body">
                             <h5 class="card-title text-primary">Kailash Mansarovar Yatra Ex Kathmandu by Road</h5>
                             <p class="card-text">The 10-day Kailash Mansarovar Yatra offers a soul-stirring journey
@@ -241,7 +283,8 @@
             <div class="col">
                 <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                     <div class="card h-100">
-                        <img src="https://www.pilgrimpackages.com/upload/package/image-MS3XW2M4WJJB33C2.jpg" class="card-img-top" alt="Golden Temple Tour" loading="lazy">
+                        <img src="https://www.pilgrimpackages.com/upload/package/image-MS3XW2M4WJJB33C2.jpg"
+                            class="card-img-top" alt="Golden Temple Tour" loading="lazy">
                         <div class="card-body">
                             <h5 class="card-title text-primary">Golden Temple Tour</h5>
                             <p class="card-text">A 3-day visit to the iconic Golden Temple in Amritsar, a spiritual
@@ -511,7 +554,8 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/generated-image (7).png" class="card-img-top" alt="AI Generated Art" loading="lazy">
+                            <img src="img/generated-image (7).png" class="card-img-top" alt="AI Generated Art"
+                                loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">AI Generated Art</h5>
                                 <p class="card-text">Unique artwork created by artificial intelligence.</p>
@@ -526,7 +570,8 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/generated-image copy.png" class="card-img-top" alt="Modern Illustration" loading="lazy">
+                            <img src="img/generated-image copy.png" class="card-img-top" alt="Modern Illustration"
+                                loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Modern Illustration</h5>
                                 <p class="card-text">A stylish illustration for contemporary design needs.</p>
@@ -540,7 +585,8 @@
                 <div class="col">
                     <a href="#" target="_blank" style="text-decoration: none; color: inherit;">
                         <div class="card h-100">
-                            <img src="img/generated-image.jpeg" class="card-img-top" alt="Photo Realistic" loading="lazy">
+                            <img src="img/generated-image.jpeg" class="card-img-top" alt="Photo Realistic"
+                                loading="lazy">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Photo Realistic</h5>
                                 <p class="card-text">A photo-realistic image with stunning detail and clarity.</p>
