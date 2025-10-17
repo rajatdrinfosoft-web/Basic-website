@@ -4,16 +4,10 @@
             <div class="col-md-4 mb-4">
                 <h2 class="mb-3 h5">Quick Links</h2>
                 <ul class="list-unstyled">
-                    <li><a href="#" class="text-white text-decoration-none">About</a></li>
-                    <li><a href="#" class="text-white text-decoration-none">Jammu & Kashmir</a></li>
-                    <li><a href="#" class="text-white text-decoration-none">Ladakh</a></li>
-                    <li><a href="#" class="text-white text-decoration-none">Himachal</a></li>
-                    <li><a href="#" class="text-white text-decoration-none">Punjab</a></li>
-                    <li><a href="#" class="text-white text-decoration-none">Uttarakhand</a></li>
-                    <li><a href="#" class="text-white text-decoration-none">Rajasthan</a></li>
-                    <li><a href="#" class="text-white text-decoration-none">Bihar</a></li>
-                    <li><a href="#" class="text-white text-decoration-none">Uttar Pradesh</a></li>
-                    <li><a href="#" class="text-white text-decoration-none">Maharashtra</a></li>
+                    <li><a href="{{ url_for('main.home') }}" class="text-white text-decoration-none">Home</a></li>
+                    <li><a href="{{ url_for('main.packages') }}" class="text-white text-decoration-none">Packages</a></li>
+                    <li><a href="{{ url_for('main.about') }}" class="text-white text-decoration-none">About</a></li>
+                    <li><a href="{{ url_for('main.contact') }}" class="text-white text-decoration-none">Contact</a></li>
                 </ul>
             </div>
             <div class="col-md-4 mb-4">

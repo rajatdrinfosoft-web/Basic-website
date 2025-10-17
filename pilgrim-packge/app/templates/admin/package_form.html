@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ title }}</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.price.label(class="form-label") }}
+            {{ form.price(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.rating.label(class="form-label") }}
+            {{ form.rating(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.image.label(class="form-label") }}
+            {{ form.image(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.duration.label(class="form-label") }}
+            {{ form.duration(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.destination.label(class="form-label") }}
+            {{ form.destination(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.best_time.label(class="form-label") }}
+            {{ form.best_time(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.group_size.label(class="form-label") }}
+            {{ form.group_size(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.overview.label(class="form-label") }}
+            {{ form.overview(class="form-control", rows=4) }}
+        </div>
+        <div class="mb-3">
+            {{ form.itinerary.label(class="form-label") }}
+            {{ form.itinerary(class="form-control", rows=6) }}
+        </div>
+        <div class="mb-3">
+            {{ form.inclusions.label(class="form-label") }}
+            {{ form.inclusions(class="form-control", rows=4) }}
+        </div>
+        <div class="mb-3">
+            {{ form.exclusions.label(class="form-label") }}
+            {{ form.exclusions(class="form-control", rows=4) }}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

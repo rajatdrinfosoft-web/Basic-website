@@ -46,7 +46,7 @@
     <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for card in cards %}
     <div class="col">
-        <a href="{{ card.link }}" target="_blank" style="text-decoration: none; color: inherit;">
+        <a href="{{ url_for('main.package_detail', id=card.id) }}" style="text-decoration: none; color: inherit;">
             <div class="card h-100">
                 <img src="{{ card.image }}" class="card-img-top" alt="{{ card.title }}" loading="lazy">
                 <div class="card-body">

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Admin Dashboard</h1>
+    <a href="{{ url_for('auth.logout') }}" class="btn btn-danger mb-3">Logout</a>
+
+    <h2>Contact Messages</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Message</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contact in contacts %}
+            <tr>
+                <td>{{ contact.id }}</td>
+                <td>{{ contact.name }}</td>
+                <td>{{ contact.email }}</td>
+                <td>{{ contact.phone or 'N/A' }}</td>
+                <td>{{ contact.message[:50] }}{% if contact.message|length > 50 %}...{% endif %}</td>
+                <td>{{ contact.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Packages</h2>
+    <a href="{{ url_for('admin.new_package') }}" class="btn btn-primary mb-3">Add New Package</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for package in packages %}
+            <tr>
+                <td>{{ package.id }}</td>
+                <td>{{ package.title }}</td>
+                <td>{{ package.price }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_package', id=package.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{{ url_for('admin.delete_package', id=package.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Events</h2>
+    <a href="{{ url_for('admin.new_event') }}" class="btn btn-primary mb-3">Add New Event</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td>{{ event.id }}</td>
+                <td>{{ event.title }}</td>
+                <td>{{ event.date }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_event', id=event.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{{ url_for('admin.delete_event', id=event.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
