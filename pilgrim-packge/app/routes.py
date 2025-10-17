@@ -4,11 +4,23 @@ from .forms import ContactForm
 
 main = Blueprint('main', __name__)
 
-@main.route('/')
+@main.route('/', methods=['GET', 'POST'])
 def home():
     cards = Package.query.limit(3).all()
     events = Event.query.all()
-    return render_template('home.html', cards=cards, events=events)
+    form = ContactForm()
+    if form.validate_on_submit():
+        contact = Contact(
+            name=form.name.data,
+            email=form.email.data,
+            phone=form.phone.data,
+            message=form.message.data
+        )
+        db.session.add(contact)
+        db.session.commit()
+        flash('Your message has been sent successfully!', 'success')
+        return redirect(url_for('main.home'))
+    return render_template('home.html', cards=cards, events=events, form=form)
 
 @main.route('/packages')
 def packages():

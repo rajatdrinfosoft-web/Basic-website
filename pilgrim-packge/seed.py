@@ -4,10 +4,12 @@ from app.models import Package, Event, User
 app = create_app()
 
 with app.app_context():
-    # Create admin user
-    admin = User(username='admin')
-    admin.set_password('admin123')
-    db.session.add(admin)
+    # Create admin user (only if not exists)
+    admin = User.query.filter_by(username='admin').first()
+    if not admin:
+        admin = User(username='admin')
+        admin.set_password('admin123')
+        db.session.add(admin)
 
     # Seed packages from extra data
     packages = [
