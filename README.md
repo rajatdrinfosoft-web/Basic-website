@@ -1,86 +1,136 @@
-# Pilgrim Packages — Frontend (HTML / CSS / JS)
+# Pilgrim Packages — Flask Web Application
 
-Summary
-- Single-page static site using Bootstrap 5.3 for layout and components.
-- Minimal internal CSS placed in `<head>` (keeps overrides small and easy to change).
-- No custom JavaScript (only Bootstrap's bundle is included). All previous custom JS was removed.
-- Accessibility and performance improvements applied (skip link, lazy loading for images, semantic markup).
+## Overview
+Pilgrim Packages is a dynamic web application built with Flask for managing and showcasing pilgrim tour packages in India. It features an admin panel for content management, user authentication, package listings, event displays, and a contact form. The app is designed for tourism businesses focusing on spiritual journeys like Char Dham Yatra, Amarnath Yatra, and visits to the Golden Temple.
 
-Files (main)
-- `index.html` — primary HTML file. Contains:
-  - Bootstrap CSS import and Google Fonts preconnect.
-  - JSON-LD organization schema.
-  - A compact internal `<style>` block for small site-specific styles and utilities.
-  - Site content: navbar, hero/header, carousels, cards, contact form, about and footer.
-  - Bootstrap JS bundle at the end of the body.
-- `index-progressive.html` — added: progressive image demo using LQIP (blur-up), <picture> with WebP/AVIF sources and a small IntersectionObserver loader. Use this to compare progressive loading patterns with the baseline.
-- `img/` — (local images referenced by `index.html`).
+## Features
+- **User Authentication**: Admin login with Flask-Login for secure access to the admin panel.
+- **Package Management**: CRUD operations for tour packages including details like itinerary, inclusions, exclusions, pricing, and ratings.
+- **Event Management**: Display and manage upcoming events related to pilgrim sites.
+- **Contact Form**: Collect user inquiries with name, email, phone, and message.
+- **Responsive UI**: Built with Bootstrap 5.3, Jinja2 templates, and custom CSS/JS.
+- **Caching & Compression**: Integrated Flask-Caching and Flask-Compress for performance.
+- **Asset Bundling**: Flask-Assets for minifying and bundling CSS/JS.
+- **Database**: PostgreSQL with SQLAlchemy ORM and Flask-Migrate for schema management.
+- **Seeding**: Pre-seeded data for packages and events via `seed.py`.
+- **Admin Dashboard**: Manage packages, events, and view contacts.
 
-Key decisions & how they map to files
-1. Styling
-   - Bootstrap handles the majority of layout, spacing and components.
-   - Small internal CSS (in `index.html` head) centralizes previously inline styles:
-     - body base (font, background, top padding for fixed navbar)
-     - header visuals (gradient, spacing, shadow)
-     - carousel image sizing
-     - utility classes:
-       - `.nav-logo` — logo size & border radius
-       - `.about-img` — fixed height & object-fit for the about image
-       - `.event-card` — fixed width for carousel event cards
-       - `.visually-hidden-focusable` — skip-link visibility on focus
-   - Rationale: keeping a small internal stylesheet improves maintainability while avoiding an external file for this small project.
+## Installation
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/rajatdrinfosoft-web/Basic-website.git
+   cd pilgrim-packge
+   ```
 
-2. JavaScript
-   - All custom JS (external-link safety, demo contact form, back-to-top, dropdown hover handlers) was intentionally removed per project decision.
-   - Only Bootstrap's official JS bundle is included:
-     ```html
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-     ```
-   - This keeps behavior consistent with native Bootstrap components (click-to-open dropdown on mobile and desktop).
+2. **Set Up Virtual Environment** (Recommended):
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate  # On Windows
+   # source venv/bin/activate  # On macOS/Linux
+   ```
 
-3. Accessibility & Performance
-   - Skip link added: `.visually-hidden-focusable` so keyboard users can skip to main content.
-   - `loading="lazy"` applied to most non-critical images; first carousel image uses `loading="eager"`.
-   - ARIA and semantic elements are used where appropriate (e.g., form controls).
-   - Avoided target="_blank" mass-manipulation JS — you can add `rel="noopener noreferrer"` manually where needed.
+3. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+   Note: Ensure you have Python 3.8+ installed.
 
-How to edit styles
-- Localized styles live inside `<style>` in `index.html` head. To change:
-  - Small visual tweaks (colors, spacing): edit the CSS variables or class rules in that block.
-  - Larger style sets / many pages: extract the styles to `assets/css/site.css` and link it from the head.
+4. **Configure Database**:
+   - Update `config.py` with your PostgreSQL connection string.
+   - For development, the config uses Neon PostgreSQL. Change `SECRET_KEY` for production.
 
-How to add custom JS (if needed)
-- If you later require behavior (e.g., back-to-top, enhanced dropdown hover):
-  - Create `assets/js/site.js`
-  - Add it just before the Bootstrap bundle or after it depending on whether you rely on bootstrap JS:
-    ```html
-    <script src="assets/js/site.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    ```
-  - Keep scripts unobtrusive: prefer event delegation, avoid inline handlers, and guard touch vs hover using media queries in CSS.
+5. **Initialize Database**:
+   ```bash
+   flask db init  # If not already done
+   flask db migrate
+   flask db upgrade
+   ```
 
-SEO & Metadata
-- Primary metadata is in the `<head>`: title, description, keywords, canonical, Open Graph tags, and JSON-LD Organization schema.
-- For better results per package/offers, consider adding Offer/Product structured data for each package card.
+6. **Seed Database** (Optional):
+   ```bash
+   python seed.py
+   ```
+   This adds sample packages (e.g., Char Dham Yatra) and events.
 
-Run / Test locally
-1. Open `index.html` in your browser (double-click or use a local static server).
-2. For a simple local server (recommended to preserve relative URLs and avoid CORS when testing):
-   - Python 3: `python -m http.server 8000` (from the project directory), then open http://localhost:8000/
-   - Node: `npx serve .`
+## Usage
+1. **Run the Application**:
+   ```bash
+   python run.py
+   ```
+   The app will run on `http://localhost:5000` in debug mode.
 
-How to test the progressive demo
-1. Open `index-progressive.html` in a browser or run a local static server (recommended).
-2. Observe hero and key card images: a tiny placeholder is shown immediately, full responsive image loads and the blur is removed when the image finishes loading.
-3. For production use: generate WebP/AVIF variants and optionally progressive JPEGs on the server.
+2. **Access the Site**:
+   - Homepage: Browse packages and events.
+   - Admin Login: Go to `/admin/login` (default: username `admin`, password `admin123`).
+   - Admin Dashboard: Manage packages, events, and contacts.
 
-Suggested next steps
-- Move the internal `<style>` into `assets/css/site.css` when styles grow.
-- Reintroduce small JS features as separate files (not inline) with feature detection (touch vs hover).
-- Optimize images: generate WebP and responsive `srcset` for better performance on mobile.
-- Add a server-side contact form handler or integrate a form service with validation + CAPTCHA.
-- Add unit tests / visual regression tests if the UI evolves.
+3. **Key Routes**:
+   - `/`: Home page with featured packages and events.
+   - `/packages`: List all packages.
+   - `/package/<id>`: Package details.
+   - `/about`, `/contact`: Static pages.
+   - `/admin/dashboard`: Admin panel.
 
-Contact & Contribution
-- This README documents the current front-end structure. For any change requests (design or behavior), modify `index.html` and, if needed, add `assets/css/site.css` and `assets/js/site.js` to keep concerns separated.
+## Project Structure
+```
+pilgrim-packge/
+├── app/
+│   ├── __init__.py          # Flask app factory and extensions
+│   ├── models.py            # SQLAlchemy models (User, Package, Event, Contact)
+│   ├── routes.py            # Main routes (home, packages, contact)
+│   ├── auth.py              # Authentication routes
+│   ├── admin_routes.py      # Admin panel routes
+│   ├── forms.py             # WTForms for forms
+│   ├── static/              # CSS, JS, images
+│   │   ├── css/
+│   │   ├── js/
+│   │   └── img/
+│   └── templates/           # Jinja2 templates
+│       ├── base.html        # Base template
+│       ├── home.html        # Homepage
+│       ├── packages.html    # Package listings
+│       ├── package_detail.html  # Package details
+│       ├── about.html       # About page
+│       ├── contact.html     # Contact page
+│       └── admin/           # Admin templates
+│           ├── dashboard.html
+│           ├── login.html
+│           ├── package_form.html
+│           └── event_form.html
+├── migrations/              # Alembic migrations
+├── extra/                   # Additional static files (e.g., index.html)
+├── config.py                # Configuration settings
+├── run.py                   # Entry point to run the app
+├── seed.py                  # Database seeding script
+├── TODO.md                  # Feature roadmap and improvements
+├── TODO_IMPROVEMENTS.md     # Additional tasks
+└── README.md                # This file
+```
+
+## Dependencies
+- Flask
+- Flask-SQLAlchemy
+- Flask-Login
+- Flask-Caching
+- Flask-Assets
+- Flask-Migrate
+- Flask-Compress
+- WTForms
+- Bootstrap 5.3 (via CDN)
+- PostgreSQL
+
+## Contributing
+1. Fork the repository.
+2. Create a feature branch: `git checkout -b feature-name`.
+3. Make changes and commit: `git commit -m 'Add feature'`.
+4. Push to branch: `git push origin feature-name`.
+5. Open a pull request.
+
+Refer to `TODO.md` for planned enhancements like security improvements, performance optimizations, and new features.
+
+## License
+This project is licensed under the MIT License. See LICENSE file for details.
+
+## Contact
+For questions or contributions, contact the project maintainer.
 
