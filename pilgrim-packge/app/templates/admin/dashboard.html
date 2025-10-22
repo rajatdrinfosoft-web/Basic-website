@@ -2,12 +2,79 @@
 
 {% block title %}Admin Dashboard{% endblock %}
 
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <h1>Admin Dashboard</h1>
     <a href="{{ url_for('auth.logout') }}" class="btn btn-danger mb-3">Logout</a>
 
+    <!-- Analytics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Packages</h5>
+                    <h2>{{ total_packages }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Total Events</h5>
+                    <h2>{{ total_events }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Total Contacts</h5>
+                    <h2>{{ total_contacts }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Contacts (7 days)</h5>
+                    <h2>{{ recent_contacts }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Package Destinations</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="destinationsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Contact Messages (Last 30 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="contactsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <h2>Contact Messages</h2>
+    <div class="mb-3">
+        <a href="{{ url_for('admin.export_contacts') }}" class="btn btn-success">Export Contacts</a>
+    </div>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -34,7 +101,10 @@
     </table>
 
     <h2>Packages</h2>
-    <a href="{{ url_for('admin.new_package') }}" class="btn btn-primary mb-3">Add New Package</a>
+    <div class="mb-3">
+        <a href="{{ url_for('admin.new_package') }}" class="btn btn-primary">Add New Package</a>
+        <a href="{{ url_for('admin.export_packages') }}" class="btn btn-success">Export Packages</a>
+    </div>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -52,6 +122,7 @@
                 <td>{{ package.price }}</td>
                 <td>
                     <a href="{{ url_for('admin.edit_package', id=package.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{{ url_for('admin.duplicate_package', id=package.id) }}" class="btn btn-sm btn-info">Duplicate</a>
                     <a href="{{ url_for('admin.delete_package', id=package.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                 </td>
             </tr>
@@ -60,7 +131,10 @@
     </table>
 
     <h2>Events</h2>
-    <a href="{{ url_for('admin.new_event') }}" class="btn btn-primary mb-3">Add New Event</a>
+    <div class="mb-3">
+        <a href="{{ url_for('admin.new_event') }}" class="btn btn-primary">Add New Event</a>
+        <a href="{{ url_for('admin.export_events') }}" class="btn btn-success">Export Events</a>
+    </div>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -85,4 +159,60 @@
         </tbody>
     </table>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Destinations Pie Chart
+    const destinationsCtx = document.getElementById('destinationsChart').getContext('2d');
+    const destinationsChart = new Chart(destinationsCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ destinations|tojson }},
+            datasets: [{
+                data: {{ dest_counts|tojson }},
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF',
+                    '#FF9F40'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Contacts Line Chart
+    const contactsCtx = document.getElementById('contactsChart').getContext('2d');
+    const contactsChart = new Chart(contactsCtx, {
+        type: 'line',
+        data: {
+            labels: {{ dates|tojson }},
+            datasets: [{
+                label: 'Contact Messages',
+                data: {{ contact_counts|tojson }},
+                borderColor: '#36A2EB',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
 {% endblock %}

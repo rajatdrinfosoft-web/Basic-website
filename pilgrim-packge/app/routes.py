@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import Package, Event, Contact, db
 from .forms import ContactForm
+from . import cache
 
 main = Blueprint('main', __name__)
 
@@ -23,10 +24,14 @@ def home():
     return render_template('home.html', cards=cards, events=events, form=form)
 
 @main.route('/packages')
+@cache.cached(timeout=300)
 def packages():
     destination = request.args.get('destination')
     price_range = request.args.get('price')
     duration = request.args.get('duration')
+    sort_by = request.args.get('sort', 'title')  # Default sort by title
+    page = int(request.args.get('page', 1))
+    per_page = 10  # Items per page
 
     query = Package.query
 
@@ -49,10 +54,22 @@ def packages():
         elif duration == '15+':
             query = query.filter(Package.duration.ilike('%15+%'))
 
-    packages = query.all()
+    # Sorting
+    if sort_by == 'price':
+        query = query.order_by(Package.price)
+    elif sort_by == 'duration':
+        query = query.order_by(Package.duration)
+    elif sort_by == 'rating':
+        query = query.order_by(Package.rating.desc())
+    else:
+        query = query.order_by(Package.title)
+
+    # Pagination
+    packages = query.paginate(page=page, per_page=per_page, error_out=False)
     return render_template('packages.html', packages=packages)
 
 @main.route('/package/<int:id>')
+@cache.cached(timeout=600)
 def package_detail(id):
     package = Package.query.get_or_404(id)
     return render_template('package_detail.html', package=package)

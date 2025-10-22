@@ -15,13 +15,13 @@ class User(db.Model, UserMixin):
 
 class Package(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=False, index=True)
     description = db.Column(db.Text)
-    price = db.Column(db.String(20))
+    price = db.Column(db.String(20), index=True)
     rating = db.Column(db.String(10))
     image = db.Column(db.String(255))
-    duration = db.Column(db.String(50))
-    destination = db.Column(db.String(100))
+    duration = db.Column(db.String(50), index=True)
+    destination = db.Column(db.String(100), index=True)
     best_time = db.Column(db.String(100))
     group_size = db.Column(db.String(50))
     overview = db.Column(db.Text)
