@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import Package, Event, Contact, db
+from .models import Package, Event, Contact, Page, Banner, FAQ, Testimonial, db
 from .forms import ContactForm
 from . import cache
 
@@ -9,6 +9,8 @@ main = Blueprint('main', __name__)
 def home():
     cards = Package.query.limit(3).all()
     events = Event.query.all()
+    banners = Banner.query.filter_by(position='home', is_active=True).order_by(Banner.order).all()
+    testimonials = Testimonial.query.filter_by(is_active=True).order_by(Testimonial.created_at.desc()).limit(3).all()
     form = ContactForm()
     if form.validate_on_submit():
         contact = Contact(
@@ -21,11 +23,13 @@ def home():
         db.session.commit()
         flash('Your message has been sent successfully!', 'success')
         return redirect(url_for('main.home'))
-    return render_template('home.html', cards=cards, events=events, form=form)
+    return render_template('home.html', cards=cards, events=events, banners=banners, testimonials=testimonials, form=form)
 
 @main.route('/packages')
 @cache.cached(timeout=300)
 def packages():
+    # Get search and filter parameters
+    search_query = request.args.get('search', '').strip()
     destination = request.args.get('destination')
     price_range = request.args.get('price')
     duration = request.args.get('duration')
@@ -35,8 +39,25 @@ def packages():
 
     query = Package.query
 
+    # Full-text search across title, description, and destination
+    if search_query:
+        search_filter = f"%{search_query}%"
+        query = query.filter(
+            db.or_(
+                Package.title.ilike(search_filter),
+                Package.description.ilike(search_filter),
+                Package.destination.ilike(search_filter),
+                Package.overview.ilike(search_filter)
+            )
+        )
+
+    # Destination filter (supports multiple selections)
     if destination:
-        query = query.filter(Package.destination.ilike(f'%{destination}%'))
+        destinations = request.args.getlist('destination')
+        if destinations:
+            query = query.filter(Package.destination.in_(destinations))
+
+    # Price range filter
     if price_range:
         if price_range == 'below_10000':
             query = query.filter(Package.price < '₹10,000')
@@ -44,6 +65,8 @@ def packages():
             query = query.filter(Package.price.between('₹10,000', '₹25,000'))
         elif price_range == 'above_50000':
             query = query.filter(Package.price > '₹50,000')
+
+    # Duration filter
     if duration:
         if duration == '1-3':
             query = query.filter(Package.duration.ilike('%1-3%'))
@@ -66,7 +89,13 @@ def packages():
 
     # Pagination
     packages = query.paginate(page=page, per_page=per_page, error_out=False)
-    return render_template('packages.html', packages=packages)
+
+    # Get unique destinations for filter dropdown
+    all_destinations = db.session.query(Package.destination).distinct().order_by(Package.destination).all()
+    destinations_list = [d[0] for d in all_destinations]
+
+    return render_template('packages.html', packages=packages, search_query=search_query,
+                         destinations_list=destinations_list)
 
 @main.route('/package/<int:id>')
 @cache.cached(timeout=600)
@@ -76,10 +105,14 @@ def package_detail(id):
 
 @main.route('/about')
 def about():
+    page = Page.query.filter_by(slug='about', is_active=True).first()
+    if page:
+        return render_template('about.html', page=page)
     return render_template('about.html')
 
 @main.route('/contact', methods=['GET', 'POST'])
 def contact():
+    page = Page.query.filter_by(slug='contact', is_active=True).first()
     form = ContactForm()
     if form.validate_on_submit():
         contact = Contact(
@@ -92,4 +125,9 @@ def contact():
         db.session.commit()
         flash('Your message has been sent successfully!', 'success')
         return redirect(url_for('main.contact'))
-    return render_template('contact.html', form=form)
+    return render_template('contact.html', form=form, page=page)
+
+@main.route('/faq')
+def faq():
+    faqs = FAQ.query.filter_by(is_active=True).order_by(FAQ.order, FAQ.created_at).all()
+    return render_template('faq.html', faqs=faqs)

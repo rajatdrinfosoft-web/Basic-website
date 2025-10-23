@@ -5,6 +5,9 @@ from flask_caching import Cache
 from flask_assets import Environment, Bundle
 from flask_migrate import Migrate
 from flask_compress import Compress
+# from werkzeug.utils import secure_filename
+# from werkzeug.datastructures import FileStorage
+# from flask_uploads import UploadSet, configure_uploads, IMAGES
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -12,6 +15,7 @@ cache = Cache()
 assets = Environment()
 migrate = Migrate()
 compress = Compress()
+# photos = UploadSet('photos', IMAGES)
 
 def create_app():
     app = Flask(__name__)
@@ -26,6 +30,7 @@ def create_app():
     assets.init_app(app)
     migrate.init_app(app, db)
     compress.init_app(app)
+    # configure_uploads(app, photos)
 
     # Define asset bundles
     css_bundle = Bundle('css/bootstrap.min.css', 'css/style.css', filters='cssmin', output='gen/packed.css')

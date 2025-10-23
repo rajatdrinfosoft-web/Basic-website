@@ -13,7 +13,7 @@
 
     <!-- Analytics Cards -->
     <div class="row mb-4">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-white bg-primary">
                 <div class="card-body">
                     <h5 class="card-title">Total Packages</h5>
@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-white bg-success">
                 <div class="card-body">
                     <h5 class="card-title">Total Events</h5>
@@ -29,7 +29,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-white bg-warning">
                 <div class="card-body">
                     <h5 class="card-title">Total Contacts</h5>
@@ -37,11 +37,27 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-white bg-info">
                 <div class="card-body">
                     <h5 class="card-title">Recent Contacts (7 days)</h5>
                     <h2>{{ recent_contacts }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-white bg-secondary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Banners</h5>
+                    <h2>{{ total_banners }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-white bg-dark">
+                <div class="card-body">
+                    <h5 class="card-title">Total Testimonials</h5>
+                    <h2>{{ total_testimonials }}</h2>
                 </div>
             </div>
         </div>
@@ -153,6 +169,132 @@
                 <td>
                     <a href="{{ url_for('admin.edit_event', id=event.id) }}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{{ url_for('admin.delete_event', id=event.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Banners</h2>
+    <div class="mb-3">
+        <a href="{{ url_for('admin.new_banner') }}" class="btn btn-primary">Add New Banner</a>
+        <a href="{{ url_for('admin.export_banners') }}" class="btn btn-success">Export Banners</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Image</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for banner in banners %}
+            <tr>
+                <td>{{ banner.id }}</td>
+                <td>{{ banner.title }}</td>
+                <td><img src="{{ banner.image }}" alt="{{ banner.title }}" style="width: 50px; height: 50px;"></td>
+                <td>{{ 'Yes' if banner.is_active else 'No' }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_banner', id=banner.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{{ url_for('admin.delete_banner', id=banner.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Testimonials</h2>
+    <div class="mb-3">
+        <a href="{{ url_for('admin.new_testimonial') }}" class="btn btn-primary">Add New Testimonial</a>
+        <a href="{{ url_for('admin.export_testimonials') }}" class="btn btn-success">Export Testimonials</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Message</th>
+                <th>Rating</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for testimonial in testimonials %}
+            <tr>
+                <td>{{ testimonial.id }}</td>
+                <td>{{ testimonial.name }}</td>
+                <td>{{ testimonial.message[:50] }}{% if testimonial.message|length > 50 %}...{% endif %}</td>
+                <td>{{ testimonial.rating }}</td>
+                <td>{{ 'Yes' if testimonial.is_active else 'No' }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_testimonial', id=testimonial.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{{ url_for('admin.delete_testimonial', id=testimonial.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Pages</h2>
+    <div class="mb-3">
+        <a href="{{ url_for('admin.new_page') }}" class="btn btn-primary">Add New Page</a>
+        <a href="{{ url_for('admin.export_pages') }}" class="btn btn-success">Export Pages</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Slug</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for page in pages %}
+            <tr>
+                <td>{{ page.id }}</td>
+                <td>{{ page.title }}</td>
+                <td>{{ page.slug }}</td>
+                <td>{{ 'Yes' if page.is_active else 'No' }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_page', id=page.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{{ url_for('admin.delete_page', id=page.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>FAQs</h2>
+    <div class="mb-3">
+        <a href="{{ url_for('admin.new_faq') }}" class="btn btn-primary">Add New FAQ</a>
+        <a href="{{ url_for('admin.export_faqs') }}" class="btn btn-success">Export FAQs</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Question</th>
+                <th>Category</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for faq in faqs %}
+            <tr>
+                <td>{{ faq.id }}</td>
+                <td>{{ faq.question[:50] }}{% if faq.question|length > 50 %}...{% endif %}</td>
+                <td>{{ faq.category }}</td>
+                <td>{{ 'Yes' if faq.is_active else 'No' }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_faq', id=faq.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{{ url_for('admin.delete_faq', id=faq.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                 </td>
             </tr>
             {% endfor %}

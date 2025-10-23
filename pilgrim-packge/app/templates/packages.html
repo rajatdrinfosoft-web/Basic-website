@@ -23,10 +23,21 @@ function sortPackages(sortValue) {
         <aside class="col-md-3 mb-4">
             <div class="card shadow-sm rounded-4 border-0">
                 <div class="card-header bg-primary text-white rounded-top-4">
-                    <h5 class="mb-0">Filter</h5>
+                    <h5 class="mb-0">Search & Filter</h5>
                 </div>
                 <div class="card-body p-0">
                     <form method="GET" action="{{ url_for('main.packages') }}">
+                        <!-- Search Bar -->
+                        <div class="p-3 border-bottom">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="search" placeholder="Search packages..."
+                                       value="{{ search_query }}" id="searchInput">
+                                <button class="btn btn-outline-secondary" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="accordion" id="filterAccordion">
                             <!-- Destination Filter -->
                             <div class="accordion-item border-0">
@@ -41,17 +52,13 @@ function sortPackages(sortValue) {
                                     aria-labelledby="headingDestination" data-bs-parent="#filterAccordion">
                                     <div class="accordion-body p-0">
                                         <ul class="list-unstyled px-3 py-2">
-                                            <li><input type="checkbox" name="destination" value="Uttarakhand" /> <label>Uttarakhand</label></li>
-                                            <li><input type="checkbox" name="destination" value="Jammu & Kashmir" /> <label>Jammu & Kashmir</label></li>
-                                            <li><input type="checkbox" name="destination" value="Ladakh" /> <label>Ladakh</label></li>
-                                            <li><input type="checkbox" name="destination" value="Himachal" /> <label>Himachal</label></li>
-                                            <li><input type="checkbox" name="destination" value="Punjab" /> <label>Punjab</label></li>
-                                            <li><input type="checkbox" name="destination" value="Rajasthan" /> <label>Rajasthan</label></li>
-                                            <li><input type="checkbox" name="destination" value="Bihar" /> <label>Bihar</label></li>
-                                            <li><input type="checkbox" name="destination" value="Uttar Pradesh" /> <label>Uttar Pradesh</label></li>
-                                            <li><input type="checkbox" name="destination" value="Delhi" /> <label>Delhi</label></li>
-                                            <li><input type="checkbox" name="destination" value="Haryana" /> <label>Haryana</label></li>
-                                            <li><input type="checkbox" name="destination" value="Gujarat" /> <label>Gujarat</label></li>
+                                            {% for dest in destinations_list %}
+                                            <li>
+                                                <input type="checkbox" name="destination" value="{{ dest }}"
+                                                       {% if dest in request.args.getlist('destination') %}checked{% endif %} />
+                                                <label>{{ dest }}</label>
+                                            </li>
+                                            {% endfor %}
                                         </ul>
                                     </div>
                                 </div>
@@ -185,7 +192,7 @@ function sortPackages(sortValue) {
                 <ul class="pagination justify-content-center">
                     {% if packages.has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('main.packages', page=packages.prev_num, destination=request.args.get('destination'), price=request.args.get('price'), duration=request.args.get('duration'), sort=request.args.get('sort')) }}">Previous</a>
+                        <a class="page-link" href="{{ url_for('main.packages', page=packages.prev_num, destination=request.args.getlist('destination'), price=request.args.get('price'), duration=request.args.get('duration'), sort=request.args.get('sort'), search=search_query) }}">Previous</a>
                     </li>
                     {% else %}
                     <li class="page-item disabled">
@@ -201,7 +208,7 @@ function sortPackages(sortValue) {
                     </li>
                     {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('main.packages', page=page_num, destination=request.args.get('destination'), price=request.args.get('price'), duration=request.args.get('duration'), sort=request.args.get('sort')) }}">{{ page_num }}</a>
+                        <a class="page-link" href="{{ url_for('main.packages', page=page_num, destination=request.args.getlist('destination'), price=request.args.get('price'), duration=request.args.get('duration'), sort=request.args.get('sort'), search=search_query) }}">{{ page_num }}</a>
                     </li>
                     {% endif %}
                     {% else %}
@@ -213,7 +220,7 @@ function sortPackages(sortValue) {
 
                     {% if packages.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('main.packages', page=packages.next_num, destination=request.args.get('destination'), price=request.args.get('price'), duration=request.args.get('duration'), sort=request.args.get('sort')) }}">Next</a>
+                        <a class="page-link" href="{{ url_for('main.packages', page=packages.next_num, destination=request.args.getlist('destination'), price=request.args.get('price'), duration=request.args.get('duration'), sort=request.args.get('sort'), search=search_query) }}">Next</a>
                     </li>
                     {% else %}
                     <li class="page-item disabled">

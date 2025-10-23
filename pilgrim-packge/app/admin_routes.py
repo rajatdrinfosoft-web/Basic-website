@@ -2,8 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from flask import Blueprint, render_template, redirect, url_for, flash, request, send_file, Response
 from flask_login import login_required
-from .models import Package, Event, Contact, db
-from .forms import PackageForm, EventForm
+from .models import Package, Event, Contact, Page, Banner, FAQ, Testimonial, SEOConfig, Language, db
+from .forms import PackageForm, EventForm, PageForm, BannerForm, FAQForm, TestimonialForm, SEOConfigForm, LanguageForm
 from io import BytesIO
 from sqlalchemy import func
 
@@ -221,3 +221,363 @@ def duplicate_package(id):
     db.session.commit()
     flash('Package duplicated successfully!')
     return redirect(url_for('admin.dashboard'))
+
+# Page CRUD
+@admin.route('/page/new', methods=['GET', 'POST'])
+@login_required
+def new_page():
+    form = PageForm()
+    if form.validate_on_submit():
+        page = Page(
+            slug=form.slug.data,
+            title=form.title.data,
+            content=form.content.data,
+            meta_title=form.meta_title.data,
+            meta_description=form.meta_description.data,
+            is_active=form.is_active.data
+        )
+        db.session.add(page)
+        db.session.commit()
+        flash('Page added successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/page_form.html', form=form, title='Add Page')
+
+@admin.route('/page/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_page(id):
+    page = Page.query.get_or_404(id)
+    form = PageForm(obj=page)
+    if form.validate_on_submit():
+        form.populate_obj(page)
+        db.session.commit()
+        flash('Page updated successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/page_form.html', form=form, title='Edit Page')
+
+@admin.route('/page/<int:id>/delete')
+@login_required
+def delete_page(id):
+    page = Page.query.get_or_404(id)
+    db.session.delete(page)
+    db.session.commit()
+    flash('Page deleted successfully!')
+    return redirect(url_for('admin.dashboard'))
+
+# Banner CRUD
+@admin.route('/banner/new', methods=['GET', 'POST'])
+@login_required
+def new_banner():
+    form = BannerForm()
+    if form.validate_on_submit():
+        banner = Banner(
+            title=form.title.data,
+            image=form.image.data,
+            link=form.link.data,
+            position=form.position.data,
+            is_active=form.is_active.data,
+            order=form.order.data
+        )
+        db.session.add(banner)
+        db.session.commit()
+        flash('Banner added successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/banner_form.html', form=form, title='Add Banner')
+
+@admin.route('/banner/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_banner(id):
+    banner = Banner.query.get_or_404(id)
+    form = BannerForm(obj=banner)
+    if form.validate_on_submit():
+        form.populate_obj(banner)
+        db.session.commit()
+        flash('Banner updated successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/banner_form.html', form=form, title='Edit Banner')
+
+@admin.route('/banner/<int:id>/delete')
+@login_required
+def delete_banner(id):
+    banner = Banner.query.get_or_404(id)
+    db.session.delete(banner)
+    db.session.commit()
+    flash('Banner deleted successfully!')
+    return redirect(url_for('admin.dashboard'))
+
+# FAQ CRUD
+@admin.route('/faq/new', methods=['GET', 'POST'])
+@login_required
+def new_faq():
+    form = FAQForm()
+    if form.validate_on_submit():
+        faq = FAQ(
+            question=form.question.data,
+            answer=form.answer.data,
+            category=form.category.data,
+            is_active=form.is_active.data,
+            order=form.order.data
+        )
+        db.session.add(faq)
+        db.session.commit()
+        flash('FAQ added successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/faq_form.html', form=form, title='Add FAQ')
+
+@admin.route('/faq/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_faq(id):
+    faq = FAQ.query.get_or_404(id)
+    form = FAQForm(obj=faq)
+    if form.validate_on_submit():
+        form.populate_obj(faq)
+        db.session.commit()
+        flash('FAQ updated successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/faq_form.html', form=form, title='Edit FAQ')
+
+@admin.route('/faq/<int:id>/delete')
+@login_required
+def delete_faq(id):
+    faq = FAQ.query.get_or_404(id)
+    db.session.delete(faq)
+    db.session.commit()
+    flash('FAQ deleted successfully!')
+    return redirect(url_for('admin.dashboard'))
+
+# Testimonial CRUD
+@admin.route('/testimonial/new', methods=['GET', 'POST'])
+@login_required
+def new_testimonial():
+    form = TestimonialForm()
+    if form.validate_on_submit():
+        testimonial = Testimonial(
+            name=form.name.data,
+            location=form.location.data,
+            rating=form.rating.data,
+            message=form.message.data,
+            image=form.image.data,
+            is_active=form.is_active.data
+        )
+        db.session.add(testimonial)
+        db.session.commit()
+        flash('Testimonial added successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/testimonial_form.html', form=form, title='Add Testimonial')
+
+@admin.route('/testimonial/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_testimonial(id):
+    testimonial = Testimonial.query.get_or_404(id)
+    form = TestimonialForm(obj=testimonial)
+    if form.validate_on_submit():
+        form.populate_obj(testimonial)
+        db.session.commit()
+        flash('Testimonial updated successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/testimonial_form.html', form=form, title='Edit Testimonial')
+
+@admin.route('/testimonial/<int:id>/delete')
+@login_required
+def delete_testimonial(id):
+    testimonial = Testimonial.query.get_or_404(id)
+    db.session.delete(testimonial)
+    db.session.commit()
+    flash('Testimonial deleted successfully!')
+    return redirect(url_for('admin.dashboard'))
+
+# SEOConfig CRUD
+@admin.route('/seoconfig/new', methods=['GET', 'POST'])
+@login_required
+def new_seoconfig():
+    form = SEOConfigForm()
+    if form.validate_on_submit():
+        seoconfig = SEOConfig(
+            key=form.key.data,
+            value=form.value.data,
+            description=form.description.data
+        )
+        db.session.add(seoconfig)
+        db.session.commit()
+        flash('SEO Config added successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/seoconfig_form.html', form=form, title='Add SEO Config')
+
+@admin.route('/seoconfig/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_seoconfig(id):
+    seoconfig = SEOConfig.query.get_or_404(id)
+    form = SEOConfigForm(obj=seoconfig)
+    if form.validate_on_submit():
+        form.populate_obj(seoconfig)
+        db.session.commit()
+        flash('SEO Config updated successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/seoconfig_form.html', form=form, title='Edit SEO Config')
+
+@admin.route('/seoconfig/<int:id>/delete')
+@login_required
+def delete_seoconfig(id):
+    seoconfig = SEOConfig.query.get_or_404(id)
+    db.session.delete(seoconfig)
+    db.session.commit()
+    flash('SEO Config deleted successfully!')
+    return redirect(url_for('admin.dashboard'))
+
+# Language CRUD
+@admin.route('/language/new', methods=['GET', 'POST'])
+@login_required
+def new_language():
+    form = LanguageForm()
+    if form.validate_on_submit():
+        language = Language(
+            code=form.code.data,
+            name=form.name.data,
+            is_active=form.is_active.data,
+            is_default=form.is_default.data
+        )
+        db.session.add(language)
+        db.session.commit()
+        flash('Language added successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/language_form.html', form=form, title='Add Language')
+
+@admin.route('/language/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_language(id):
+    language = Language.query.get_or_404(id)
+    form = LanguageForm(obj=language)
+    if form.validate_on_submit():
+        form.populate_obj(language)
+        db.session.commit()
+        flash('Language updated successfully!')
+        return redirect(url_for('admin.dashboard'))
+    return render_template('admin/language_form.html', form=form, title='Edit Language')
+
+@admin.route('/language/<int:id>/delete')
+@login_required
+def delete_language(id):
+    language = Language.query.get_or_404(id)
+    db.session.delete(language)
+    db.session.commit()
+    flash('Language deleted successfully!')
+    return redirect(url_for('admin.dashboard'))
+
+# Export routes for new models
+@admin.route('/export/pages')
+@login_required
+def export_pages():
+    pages = Page.query.all()
+    data = [{
+        'id': p.id,
+        'slug': p.slug,
+        'title': p.title,
+        'content': p.content,
+        'meta_title': p.meta_title,
+        'meta_description': p.meta_description,
+        'is_active': p.is_active,
+        'created_at': p.created_at,
+        'updated_at': p.updated_at
+    } for p in pages]
+    df = pd.DataFrame(data)
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Pages')
+    output.seek(0)
+    return send_file(output, download_name='pages.xlsx', as_attachment=True)
+
+@admin.route('/export/banners')
+@login_required
+def export_banners():
+    banners = Banner.query.all()
+    data = [{
+        'id': b.id,
+        'title': b.title,
+        'image': b.image,
+        'link': b.link,
+        'position': b.position,
+        'is_active': b.is_active,
+        'order': b.order,
+        'created_at': b.created_at
+    } for b in banners]
+    df = pd.DataFrame(data)
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Banners')
+    output.seek(0)
+    return send_file(output, download_name='banners.xlsx', as_attachment=True)
+
+@admin.route('/export/faqs')
+@login_required
+def export_faqs():
+    faqs = FAQ.query.all()
+    data = [{
+        'id': f.id,
+        'question': f.question,
+        'answer': f.answer,
+        'category': f.category,
+        'is_active': f.is_active,
+        'order': f.order,
+        'created_at': f.created_at
+    } for f in faqs]
+    df = pd.DataFrame(data)
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='FAQs')
+    output.seek(0)
+    return send_file(output, download_name='faqs.xlsx', as_attachment=True)
+
+@admin.route('/export/testimonials')
+@login_required
+def export_testimonials():
+    testimonials = Testimonial.query.all()
+    data = [{
+        'id': t.id,
+        'name': t.name,
+        'location': t.location,
+        'rating': t.rating,
+        'message': t.message,
+        'image': t.image,
+        'is_active': t.is_active,
+        'created_at': t.created_at
+    } for t in testimonials]
+    df = pd.DataFrame(data)
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Testimonials')
+    output.seek(0)
+    return send_file(output, download_name='testimonials.xlsx', as_attachment=True)
+
+@admin.route('/export/seoconfigs')
+@login_required
+def export_seoconfigs():
+    seoconfigs = SEOConfig.query.all()
+    data = [{
+        'id': s.id,
+        'key': s.key,
+        'value': s.value,
+        'description': s.description
+    } for s in seoconfigs]
+    df = pd.DataFrame(data)
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='SEOConfigs')
+    output.seek(0)
+    return send_file(output, download_name='seoconfigs.xlsx', as_attachment=True)
+
+@admin.route('/export/languages')
+@login_required
+def export_languages():
+    languages = Language.query.all()
+    data = [{
+        'id': l.id,
+        'code': l.code,
+        'name': l.name,
+        'is_active': l.is_active,
+        'is_default': l.is_default
+    } for l in languages]
+    df = pd.DataFrame(data)
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Languages')
+    output.seek(0)
+    return send_file(output, download_name='languages.xlsx', as_attachment=True)
