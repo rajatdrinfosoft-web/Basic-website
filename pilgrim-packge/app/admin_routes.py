@@ -55,14 +55,23 @@ def new_package():
             price=form.price.data,
             rating=form.rating.data,
             image=form.image.data,
+            gallery_images=form.gallery_images.data,
             duration=form.duration.data,
             destination=form.destination.data,
             best_time=form.best_time.data,
             group_size=form.group_size.data,
             overview=form.overview.data,
             itinerary=form.itinerary.data,
+            itinerary_days=form.itinerary_days.data,
             inclusions=form.inclusions.data,
-            exclusions=form.exclusions.data
+            exclusions=form.exclusions.data,
+            highlights=form.highlights.data,
+            accommodation_details=form.accommodation_details.data,
+            transportation_details=form.transportation_details.data,
+            cancellation_policy=form.cancellation_policy.data,
+            terms_conditions=form.terms_conditions.data,
+            video_url=form.video_url.data,
+            map_location=form.map_location.data
         )
         db.session.add(package)
         db.session.commit()
@@ -143,14 +152,23 @@ def export_packages():
         'price': p.price,
         'rating': p.rating,
         'image': p.image,
+        'gallery_images': p.gallery_images,
         'duration': p.duration,
         'destination': p.destination,
         'best_time': p.best_time,
         'group_size': p.group_size,
         'overview': p.overview,
         'itinerary': p.itinerary,
+        'itinerary_days': p.itinerary_days,
         'inclusions': p.inclusions,
-        'exclusions': p.exclusions
+        'exclusions': p.exclusions,
+        'highlights': p.highlights,
+        'accommodation_details': p.accommodation_details,
+        'transportation_details': p.transportation_details,
+        'cancellation_policy': p.cancellation_policy,
+        'terms_conditions': p.terms_conditions,
+        'video_url': p.video_url,
+        'map_location': p.map_location
     } for p in packages]
     df = pd.DataFrame(data)
     output = BytesIO()
@@ -208,14 +226,23 @@ def duplicate_package(id):
         price=package.price,
         rating=package.rating,
         image=package.image,
+        gallery_images=package.gallery_images,
         duration=package.duration,
         destination=package.destination,
         best_time=package.best_time,
         group_size=package.group_size,
         overview=package.overview,
         itinerary=package.itinerary,
+        itinerary_days=package.itinerary_days,
         inclusions=package.inclusions,
-        exclusions=package.exclusions
+        exclusions=package.exclusions,
+        highlights=package.highlights,
+        accommodation_details=package.accommodation_details,
+        transportation_details=package.transportation_details,
+        cancellation_policy=package.cancellation_policy,
+        terms_conditions=package.terms_conditions,
+        video_url=package.video_url,
+        map_location=package.map_location
     )
     db.session.add(new_package)
     db.session.commit()

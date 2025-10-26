@@ -13,7 +13,30 @@
     </nav>
     <div class="row">
         <div class="col-lg-6 mb-4">
-            <img src="{{ package.image }}" alt="{{ package.title }}" class="img-fluid rounded-4 shadow w-100" style="max-height:340px;object-fit:cover;" loading="lazy">
+            <div id="packageCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner rounded-4 shadow">
+                    <div class="carousel-item active">
+                        <img src="{{ package.image }}" alt="{{ package.title }}" class="d-block w-100" style="max-height:340px;object-fit:cover;" loading="lazy">
+                    </div>
+                    {% if package.gallery_images %}
+                        {% for image in package.gallery_images.split(',') %}
+                            <div class="carousel-item">
+                                <img src="{{ image.strip() }}" alt="{{ package.title }}" class="d-block w-100" style="max-height:340px;object-fit:cover;" loading="lazy">
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% if package.gallery_images %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#packageCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#packageCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                {% endif %}
+            </div>
         </div>
         <div class="col-lg-6">
             <h1 class="fw-bold text-primary mb-2">{{ package.title }}</h1>
@@ -37,17 +60,39 @@
                 <span class="me-3"><i class="bi bi-binoculars"></i> Sightseeing</span>
             </div>
             <p class="lead">{{ package.overview }}</p>
+            {% if package.highlights %}
+                <h5 class="fw-bold mb-2">Highlights</h5>
+                <ul>
+                    {% for highlight in package.highlights.split('\n') %}
+                        <li>{{ highlight }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
     </div>
     <hr>
     <div class="row">
         <div class="col-lg-8">
+            {% if package.video_url %}
+                <div class="mb-4">
+                    <h3 class="fw-bold mb-3">Video</h3>
+                    <div class="ratio ratio-16x9">
+                        <iframe src="{{ package.video_url }}" title="Package Video" allowfullscreen></iframe>
+                    </div>
+                </div>
+            {% endif %}
             <h3 class="fw-bold mb-3">Itinerary</h3>
             <ul class="list-group mb-4">
                 {% for line in package.itinerary.split('\n') %}
                 <li class="list-group-item">{{ line }}</li>
                 {% endfor %}
             </ul>
+            {% if package.itinerary_days %}
+                <h4 class="fw-bold mb-2">Detailed Itinerary</h4>
+                <div class="mb-4">
+                    {{ package.itinerary_days | safe }}
+                </div>
+            {% endif %}
             <h4 class="fw-bold mb-2">Inclusions</h4>
             <ul>
                 {% for line in package.inclusions.split('\n') %}
@@ -60,6 +105,28 @@
                 <li>{{ line }}</li>
                 {% endfor %}
             </ul>
+            {% if package.accommodation_details %}
+                <h4 class="fw-bold mb-2">Accommodation Details</h4>
+                <p>{{ package.accommodation_details }}</p>
+            {% endif %}
+            {% if package.transportation_details %}
+                <h4 class="fw-bold mb-2">Transportation Details</h4>
+                <p>{{ package.transportation_details }}</p>
+            {% endif %}
+            {% if package.cancellation_policy %}
+                <h4 class="fw-bold mb-2">Cancellation Policy</h4>
+                <p>{{ package.cancellation_policy }}</p>
+            {% endif %}
+            {% if package.terms_conditions %}
+                <h4 class="fw-bold mb-2">Terms & Conditions</h4>
+                <p>{{ package.terms_conditions }}</p>
+            {% endif %}
+            {% if package.map_location %}
+                <h4 class="fw-bold mb-2">Location Map</h4>
+                <div class="mb-4">
+                    {{ package.map_location | safe }}
+                </div>
+            {% endif %}
         </div>
         <div class="col-lg-4">
             <div class="card shadow rounded-4 mb-4">

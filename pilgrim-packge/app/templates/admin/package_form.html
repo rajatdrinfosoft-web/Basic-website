@@ -28,6 +28,10 @@
             {{ form.image(class="form-control") }}
         </div>
         <div class="mb-3">
+            {{ form.gallery_images.label(class="form-label") }}
+            {{ form.gallery_images(class="form-control", rows=3, placeholder="Enter image URLs separated by commas") }}
+        </div>
+        <div class="mb-3">
             {{ form.duration.label(class="form-label") }}
             {{ form.duration(class="form-control") }}
         </div>
@@ -52,12 +56,44 @@
             {{ form.itinerary(class="form-control", rows=6) }}
         </div>
         <div class="mb-3">
+            {{ form.itinerary_days.label(class="form-label") }}
+            {{ form.itinerary_days(class="form-control", rows=8, placeholder="Enter detailed day-by-day itinerary") }}
+        </div>
+        <div class="mb-3">
             {{ form.inclusions.label(class="form-label") }}
             {{ form.inclusions(class="form-control", rows=4) }}
         </div>
         <div class="mb-3">
             {{ form.exclusions.label(class="form-label") }}
             {{ form.exclusions(class="form-control", rows=4) }}
+        </div>
+        <div class="mb-3">
+            {{ form.highlights.label(class="form-label") }}
+            {{ form.highlights(class="form-control", rows=4) }}
+        </div>
+        <div class="mb-3">
+            {{ form.accommodation_details.label(class="form-label") }}
+            {{ form.accommodation_details(class="form-control", rows=4) }}
+        </div>
+        <div class="mb-3">
+            {{ form.transportation_details.label(class="form-label") }}
+            {{ form.transportation_details(class="form-control", rows=4) }}
+        </div>
+        <div class="mb-3">
+            {{ form.cancellation_policy.label(class="form-label") }}
+            {{ form.cancellation_policy(class="form-control", rows=4) }}
+        </div>
+        <div class="mb-3">
+            {{ form.terms_conditions.label(class="form-label") }}
+            {{ form.terms_conditions(class="form-control", rows=4) }}
+        </div>
+        <div class="mb-3">
+            {{ form.video_url.label(class="form-label") }}
+            {{ form.video_url(class="form-control", placeholder="e.g., https://youtube.com/watch?v=...") }}
+        </div>
+        <div class="mb-3">
+            {{ form.map_location.label(class="form-label") }}
+            {{ form.map_location(class="form-control", placeholder="Enter embed code or location URL") }}
         </div>
         {{ form.submit(class="btn btn-primary") }}
         <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>

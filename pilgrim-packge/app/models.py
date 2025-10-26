@@ -20,14 +20,23 @@ class Package(db.Model):
     price = db.Column(db.String(20), index=True)
     rating = db.Column(db.String(10))
     image = db.Column(db.String(255))
+    gallery_images = db.Column(db.Text)  # Comma-separated image URLs
     duration = db.Column(db.String(50), index=True)
     destination = db.Column(db.String(100), index=True)
     best_time = db.Column(db.String(100))
     group_size = db.Column(db.String(50))
     overview = db.Column(db.Text)
     itinerary = db.Column(db.Text)
+    itinerary_days = db.Column(db.Text)  # Structured day-by-day data
     inclusions = db.Column(db.Text)
     exclusions = db.Column(db.Text)
+    highlights = db.Column(db.Text)  # Key package highlights
+    accommodation_details = db.Column(db.Text)
+    transportation_details = db.Column(db.Text)
+    cancellation_policy = db.Column(db.Text)
+    terms_conditions = db.Column(db.Text)
+    video_url = db.Column(db.String(255))  # For video tours
+    map_location = db.Column(db.String(255))  # For embedded maps
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
