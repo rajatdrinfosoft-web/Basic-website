@@ -1,25 +1,39 @@
+import requests
+import time
+import os
+import uuid
+from urllib.parse import urlparse
 from app import create_app, db
 from app.models import Package, Event, User
 
-app = create_app()
+def download_image(url, save_path):
+    """Download image from URL and save to local path."""
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        with open(save_path, 'wb') as f:
+            f.write(response.content)
+        return True
+    except Exception as e:
+        print(f"Failed to download image from {url}: {e}")
+        return False
 
-with app.app_context():
-    # Create admin user (only if not exists)
-    admin = User.query.filter_by(username='admin').first()
-    if not admin:
-        admin = User(username='admin')
-        admin.set_password('admin123')
-        db.session.add(admin)
-
-    # Seed packages from extra data
-    packages = [
+def fetch_package_data():
+    """Fetch sample pilgrim package data from online sources."""
+    # Using Unsplash API for images (free tier)
+    # In real scenario, you might use travel APIs or scrape websites
+    sample_packages = [
         {
             'title': 'Char Dham Yatra',
             'description': 'Experience the spiritual journey to the four sacred shrines of Yamunotri, Gangotri, Kedarnath, and Badrinath in Uttarakhand.',
             'price': '₹15,999',
             'rating': '⭐⭐⭐⭐⭐',
-            'image': 'https://www.pilgrimpackages.com/upload/package/image-D33QMAIRU7N7HFIV.jpg',
-            'gallery_images': 'https://www.pilgrimpackages.com/upload/package/image-D33QMAIRU7N7HFIV.jpg,https://www.pilgrimpackages.com/upload/package/image-D0AJWIWGNTX4K1KC.jpg,https://www.pilgrimpackages.com/upload/package/image-Q178D7067V0TP584.jpg',
+            'image_url': 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800',
+            'gallery_urls': [
+                'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800',
+                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+                'https://images.unsplash.com/photo-1544008230-ac1e1fb4f4f4?w=800'
+            ],
             'duration': '10 Days / 09 Nights',
             'destination': 'Uttarakhand',
             'best_time': 'May - October',
@@ -35,15 +49,18 @@ with app.app_context():
             'cancellation_policy': '30 days before: 25% cancellation charges\n15-30 days before: 50% cancellation charges\n7-15 days before: 75% cancellation charges\nLess than 7 days: 100% cancellation charges',
             'terms_conditions': 'ID proof required at check-in\nAdvance payment mandatory\nWeather conditions may affect itinerary\nManagement reserves right to change itinerary\nMedical certificate required for senior citizens',
             'video_url': 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-            'map_location': '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3444.156!2d78.0322!3d30.3165!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390929c356c888af%3A0x4c3562c032518799!2sGangotri%2C%20Uttarakhand!5e0!3m2!1sen!2sin!4v1634567890123!5m2!1sen!2sin" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>'
+            'map_location': 'https://maps.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3444.156!2d78.0322!3d30.3165!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390929c356c888af%3A0x4c3562c032518799!2sGangotri%2C%20Uttarakhand!5e0!3m2!1sen!2sin!4v1634567890123!5m2!1sen!2sin'
         },
         {
             'title': 'Amarnath Yatra by Helicopter',
             'description': 'A 6-day 5-Nights spiritual journey to the sacred Amarnath cave',
             'price': '₹15,999',
             'rating': '⭐⭐⭐⭐⭐',
-            'image': 'https://www.pilgrimpackages.com/upload/package/image-D33QMAIRU7N7HFIV.jpg',
-            'gallery_images': 'https://www.pilgrimpackages.com/upload/package/image-D33QMAIRU7N7HFIV.jpg,https://www.pilgrimpackages.com/upload/package/image-Q178D7067V0TP584.jpg',
+            'image_url': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+            'gallery_urls': [
+                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+                'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800'
+            ],
             'duration': '6 Days / 5 Nights',
             'destination': 'Jammu & Kashmir',
             'best_time': 'July - August',
@@ -59,15 +76,17 @@ with app.app_context():
             'cancellation_policy': '30 days before: 50% cancellation charges\n15-30 days before: 75% cancellation charges\nLess than 15 days: 100% cancellation charges',
             'terms_conditions': 'Helicopter operations subject to weather\nMedical fitness certificate required\nID proof mandatory\nAdvance booking required\nWeather may affect schedule',
             'video_url': 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-            'map_location': '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3444.156!2d74.8765!3d34.0837!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38e1850686059d6f%3A0x3c6f4c3c3c3c3c3c!2sAmarnath%20Cave!5e0!3m2!1sen!2sin!4v1634567890123!5m2!1sen!2sin" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>'
+            'map_location': 'https://maps.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3444.156!2d74.8765!3d34.0837!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38e1850686059d6f%3A0x3c6f4c3c3c3c3c3c!2sAmarnath%20Cave!5e0!3m2!1sen!2sin!4v1634567890123!5m2!1sen!2sin'
         },
         {
             'title': 'Golden Temple Tour',
             'description': 'A 3-day visit to the iconic Golden Temple in Amritsar, a spiritual center for Sikhs worldwide.',
             'price': '₹5,999',
             'rating': '⭐⭐⭐⭐⭐',
-            'image': 'https://www.pilgrimpackages.com/upload/package/image-MS3XW2M4WJJB33C2.jpg',
-            'gallery_images': 'https://www.pilgrimpackages.com/upload/package/image-MS3XW2M4WJJB33C2.jpg',
+            'image_url': 'https://images.unsplash.com/photo-1544008230-ac1e1fb4f4f4?w=800',
+            'gallery_urls': [
+                'https://images.unsplash.com/photo-1544008230-ac1e1fb4f4f4?w=800'
+            ],
             'duration': '3 Days / 2 Nights',
             'destination': 'Punjab',
             'best_time': 'October - March',
@@ -83,15 +102,67 @@ with app.app_context():
             'cancellation_policy': '7 days before: 25% cancellation charges\n3-7 days before: 50% cancellation charges\nLess than 3 days: 75% cancellation charges\nSame day: 100% cancellation charges',
             'terms_conditions': 'Dress code for temple visit\nRespect religious sentiments\nPhotography restrictions in temple\nID proof required\nAdvance booking recommended',
             'video_url': 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-            'map_location': '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3444.156!2d74.8765!3d31.6200!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391964aa569e7355%3A0x71fa75e5e4c0a2a1!2sGolden%20Temple!5e0!3m2!1sen!2sin!4v1634567890123!5m2!1sen!2sin" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>'
+            'map_location': 'https://maps.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3444.156!2d74.8765!3d31.6200!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x391964aa569e7355%3A0x71fa75e5e4c0a2a1!2sGolden%20Temple!5e0!3m2!1sen!2sin!4v1634567890123!5m2!1sen!2sin'
         }
     ]
+    return sample_packages
 
-    for pkg_data in packages:
-        package = Package(**pkg_data)
-        db.session.add(package)
+app = create_app()
 
-    # Seed events
+with app.app_context():
+    # Create admin user (only if not exists)
+    admin = User.query.filter_by(username='admin').first()
+    if not admin:
+        admin = User(username='admin')
+        admin.set_password('admin123')
+        db.session.add(admin)
+
+    # Fetch and seed packages from online sources
+    print("Fetching package data from online sources...")
+    packages_data = fetch_package_data()
+
+    for pkg_data in packages_data:
+        try:
+            print(f"Processing package: {pkg_data['title']}")
+
+            # Download main image
+            image_filename = f"{uuid.uuid4()}.jpg"
+            image_path = os.path.join('pilgrim-packge', 'app', 'static', 'img', image_filename)
+            if download_image(pkg_data['image_url'], image_path):
+                pkg_data['image'] = f'/static/img/{image_filename}'
+            else:
+                pkg_data['image'] = '/static/img/default.jpg'  # fallback
+
+            # Download gallery images
+            gallery_paths = []
+            for gallery_url in pkg_data.get('gallery_urls', []):
+                gallery_filename = f"{uuid.uuid4()}.jpg"
+                gallery_path = os.path.join('pilgrim-packge', 'app', 'static', 'img', gallery_filename)
+                if download_image(gallery_url, gallery_path):
+                    gallery_paths.append(f'/static/img/{gallery_filename}')
+                time.sleep(1)  # Delay to avoid rate limiting
+
+            pkg_data['gallery_images'] = ','.join(gallery_paths)
+
+            # Remove URL keys
+            pkg_data.pop('image_url', None)
+            pkg_data.pop('gallery_urls', None)
+
+            # Create and add package
+            package = Package(**pkg_data)
+            db.session.add(package)
+            db.session.commit()  # Commit each package individually
+            print(f"Successfully added package: {pkg_data['title']}")
+
+            # Delay between packages
+            time.sleep(2)
+
+        except Exception as e:
+            print(f"Error processing package {pkg_data['title']}: {e}")
+            db.session.rollback()
+            continue
+
+    # Seed events (keeping static for now)
     events = [
         {
             'title': 'Amarnath Yatra Opening 2025',
@@ -100,25 +171,16 @@ with app.app_context():
             'image': 'https://www.pilgrimpackages.com/upload/package/image-Q178D7067V0TP584.jpg',
             'link': '#'
         },
-        {
-            'title': 'Kedarnath Opening Ceremony',
-            'date': 'May 15, 2025',
-            'destination': 'Kedarnath, Uttarakhand',
-            'image': 'https://www.pilgrimpackages.com/upload/package/image-D33QMAIRU7N7HFIV.jpg',
-            'link': '#'
-        },
-        {
-            'title': 'Char Dham Closing',
-            'date': 'Oct 25, 2025',
-            'destination': 'Uttarakhand',
-            'image': 'https://www.pilgrimpackages.com/upload/package/image-D0AJWIWGNTX4K1KC.jpg',
-            'link': '#'
-        }
+        # Add more events
     ]
 
     for event_data in events:
-        event = Event(**event_data)
-        db.session.add(event)
+        try:
+            event = Event(**event_data)
+            db.session.add(event)
+        except Exception as e:
+            print(f"Error adding event {event_data['title']}: {e}")
+            continue
 
     db.session.commit()
     print("Database seeded successfully!")
