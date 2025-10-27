@@ -131,3 +131,7 @@ def contact():
 def faq():
     faqs = FAQ.query.filter_by(is_active=True).order_by(FAQ.order, FAQ.created_at).all()
     return render_template('faq.html', faqs=faqs)
+
+@main.route('/offline')
+def offline():
+    return render_template('offline.html')
