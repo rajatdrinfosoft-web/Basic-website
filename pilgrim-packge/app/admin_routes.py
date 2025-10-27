@@ -15,11 +15,17 @@ def dashboard():
     packages = Package.query.all()
     events = Event.query.all()
     contacts = Contact.query.order_by(Contact.created_at.desc()).all()
+    banners = Banner.query.all()
+    testimonials = Testimonial.query.all()
+    pages = Page.query.all()
+    faqs = FAQ.query.all()
 
     # Analytics data
     total_packages = len(packages)
     total_events = len(events)
     total_contacts = len(contacts)
+    total_banners = len(banners)
+    total_testimonials = len(testimonials)
 
     # Recent contacts (last 7 days)
     from datetime import datetime, timedelta
@@ -39,7 +45,9 @@ def dashboard():
     contact_counts = [d[1] for d in contact_dates]
 
     return render_template('admin/dashboard.html', packages=packages, events=events, contacts=contacts,
+                         banners=banners, testimonials=testimonials, pages=pages, faqs=faqs,
                          total_packages=total_packages, total_events=total_events, total_contacts=total_contacts,
+                         total_banners=total_banners, total_testimonials=total_testimonials,
                          recent_contacts=recent_contacts, destinations=destinations, dest_counts=dest_counts,
                          dates=dates, contact_counts=contact_counts)
 
