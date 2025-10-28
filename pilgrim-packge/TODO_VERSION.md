@@ -9,5 +9,5 @@
 - [x] Update export_packages route to include version
 - [x] Create database migration for version column
 - [x] Run migration to update database
-- [ ] Test package edit form shows version field
-- [ ] Verify version saves/loads correctly
+- [x] Test package edit form shows version field
+- [x] Verify version saves/loads correctly
