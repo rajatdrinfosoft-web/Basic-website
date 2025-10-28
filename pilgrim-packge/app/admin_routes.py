@@ -58,6 +58,57 @@ def dashboard():
 def new_package():
     form = PackageForm()
     if form.validate_on_submit():
+        # Sanitize HTML content to prevent XSS
+        sanitized_overview = bleach.clean(
+            form.overview.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_itinerary = bleach.clean(
+            form.itinerary.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_itinerary_days = bleach.clean(
+            form.itinerary_days.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_inclusions = bleach.clean(
+            form.inclusions.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_exclusions = bleach.clean(
+            form.exclusions.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_highlights = bleach.clean(
+            form.highlights.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_accommodation_details = bleach.clean(
+            form.accommodation_details.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_transportation_details = bleach.clean(
+            form.transportation_details.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_cancellation_policy = bleach.clean(
+            form.cancellation_policy.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_terms_conditions = bleach.clean(
+            form.terms_conditions.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
         package = Package(
             title=form.title.data,
             description=form.description.data,
@@ -69,18 +120,19 @@ def new_package():
             destination=form.destination.data,
             best_time=form.best_time.data,
             group_size=form.group_size.data,
-            overview=form.overview.data,
-            itinerary=form.itinerary.data,
-            itinerary_days=form.itinerary_days.data,
-            inclusions=form.inclusions.data,
-            exclusions=form.exclusions.data,
-            highlights=form.highlights.data,
-            accommodation_details=form.accommodation_details.data,
-            transportation_details=form.transportation_details.data,
-            cancellation_policy=form.cancellation_policy.data,
-            terms_conditions=form.terms_conditions.data,
+            overview=sanitized_overview,
+            itinerary=sanitized_itinerary,
+            itinerary_days=sanitized_itinerary_days,
+            inclusions=sanitized_inclusions,
+            exclusions=sanitized_exclusions,
+            highlights=sanitized_highlights,
+            accommodation_details=sanitized_accommodation_details,
+            transportation_details=sanitized_transportation_details,
+            cancellation_policy=sanitized_cancellation_policy,
+            terms_conditions=sanitized_terms_conditions,
             video_url=form.video_url.data,
-            map_location=form.map_location.data
+            map_location=form.map_location.data,
+            version=form.version.data
         )
         db.session.add(package)
         db.session.commit()
@@ -94,7 +146,80 @@ def edit_package(id):
     package = Package.query.get_or_404(id)
     form = PackageForm(obj=package)
     if form.validate_on_submit():
-        form.populate_obj(package)
+        # Sanitize HTML content to prevent XSS
+        sanitized_overview = bleach.clean(
+            form.overview.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_itinerary = bleach.clean(
+            form.itinerary.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_itinerary_days = bleach.clean(
+            form.itinerary_days.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_inclusions = bleach.clean(
+            form.inclusions.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_exclusions = bleach.clean(
+            form.exclusions.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_highlights = bleach.clean(
+            form.highlights.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_accommodation_details = bleach.clean(
+            form.accommodation_details.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_transportation_details = bleach.clean(
+            form.transportation_details.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_cancellation_policy = bleach.clean(
+            form.cancellation_policy.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        sanitized_terms_conditions = bleach.clean(
+            form.terms_conditions.data or '',
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
+        )
+        package.title = form.title.data
+        package.description = form.description.data
+        package.price = form.price.data
+        package.rating = form.rating.data
+        package.image = form.image.data
+        package.gallery_images = form.gallery_images.data
+        package.duration = form.duration.data
+        package.destination = form.destination.data
+        package.best_time = form.best_time.data
+        package.group_size = form.group_size.data
+        package.overview = sanitized_overview
+        package.itinerary = sanitized_itinerary
+        package.itinerary_days = sanitized_itinerary_days
+        package.inclusions = sanitized_inclusions
+        package.exclusions = sanitized_exclusions
+        package.highlights = sanitized_highlights
+        package.accommodation_details = sanitized_accommodation_details
+        package.transportation_details = sanitized_transportation_details
+        package.cancellation_policy = sanitized_cancellation_policy
+        package.terms_conditions = sanitized_terms_conditions
+        package.video_url = form.video_url.data
+        package.map_location = form.map_location.data
+        package.version = form.version.data
         db.session.commit()
         flash('Package updated successfully!')
         return redirect(url_for('admin.dashboard'))
@@ -177,7 +302,8 @@ def export_packages():
         'cancellation_policy': p.cancellation_policy,
         'terms_conditions': p.terms_conditions,
         'video_url': p.video_url,
-        'map_location': p.map_location
+        'map_location': p.map_location,
+        'version': p.version
     } for p in packages]
     df = pd.DataFrame(data)
     output = BytesIO()
@@ -251,7 +377,8 @@ def duplicate_package(id):
         cancellation_policy=package.cancellation_policy,
         terms_conditions=package.terms_conditions,
         video_url=package.video_url,
-        map_location=package.map_location
+        map_location=package.map_location,
+        version=package.version
     )
     db.session.add(new_package)
     db.session.commit()

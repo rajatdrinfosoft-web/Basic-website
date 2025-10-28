@@ -30,6 +30,7 @@ class PackageForm(FlaskForm):
     terms_conditions = TextAreaField('Terms & Conditions')
     video_url = StringField('Video URL', validators=[Length(max=255)])
     map_location = StringField('Map Location/Embed Code', validators=[Length(max=255)])
+    version = StringField('Version', validators=[Length(max=20)])
     submit = SubmitField('Save Package')
 
 class EventForm(FlaskForm):

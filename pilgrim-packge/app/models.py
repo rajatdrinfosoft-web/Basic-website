@@ -37,6 +37,7 @@ class Package(db.Model):
     terms_conditions = db.Column(db.Text)
     video_url = db.Column(db.String(255))  # For video tours
     map_location = db.Column(db.String(255))  # For embedded maps
+    version = db.Column(db.String(20))  # Package version
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -2,6 +2,10 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block head %}
+<script src="https://cdn.ckeditor.com/4.25.1-lts/standard/ckeditor.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <h1>{{ title }}</h1>
@@ -49,43 +53,43 @@
         </div>
         <div class="mb-3">
             {{ form.overview.label(class="form-label") }}
-            {{ form.overview(class="form-control", rows=4) }}
+            {{ form.overview(class="form-control", rows=4, id="overview") }}
         </div>
         <div class="mb-3">
             {{ form.itinerary.label(class="form-label") }}
-            {{ form.itinerary(class="form-control", rows=6) }}
+            {{ form.itinerary(class="form-control", rows=6, id="itinerary") }}
         </div>
         <div class="mb-3">
             {{ form.itinerary_days.label(class="form-label") }}
-            {{ form.itinerary_days(class="form-control", rows=8, placeholder="Enter detailed day-by-day itinerary") }}
+            {{ form.itinerary_days(class="form-control", rows=8, placeholder="Enter detailed day-by-day itinerary", id="itinerary_days") }}
         </div>
         <div class="mb-3">
             {{ form.inclusions.label(class="form-label") }}
-            {{ form.inclusions(class="form-control", rows=4) }}
+            {{ form.inclusions(class="form-control", rows=4, id="inclusions") }}
         </div>
         <div class="mb-3">
             {{ form.exclusions.label(class="form-label") }}
-            {{ form.exclusions(class="form-control", rows=4) }}
+            {{ form.exclusions(class="form-control", rows=4, id="exclusions") }}
         </div>
         <div class="mb-3">
             {{ form.highlights.label(class="form-label") }}
-            {{ form.highlights(class="form-control", rows=4) }}
+            {{ form.highlights(class="form-control", rows=4, id="highlights") }}
         </div>
         <div class="mb-3">
             {{ form.accommodation_details.label(class="form-label") }}
-            {{ form.accommodation_details(class="form-control", rows=4) }}
+            {{ form.accommodation_details(class="form-control", rows=4, id="accommodation_details") }}
         </div>
         <div class="mb-3">
             {{ form.transportation_details.label(class="form-label") }}
-            {{ form.transportation_details(class="form-control", rows=4) }}
+            {{ form.transportation_details(class="form-control", rows=4, id="transportation_details") }}
         </div>
         <div class="mb-3">
             {{ form.cancellation_policy.label(class="form-label") }}
-            {{ form.cancellation_policy(class="form-control", rows=4) }}
+            {{ form.cancellation_policy(class="form-control", rows=4, id="cancellation_policy") }}
         </div>
         <div class="mb-3">
             {{ form.terms_conditions.label(class="form-label") }}
-            {{ form.terms_conditions(class="form-control", rows=4) }}
+            {{ form.terms_conditions(class="form-control", rows=4, id="terms_conditions") }}
         </div>
         <div class="mb-3">
             {{ form.video_url.label(class="form-label") }}
@@ -95,8 +99,27 @@
             {{ form.map_location.label(class="form-label") }}
             {{ form.map_location(class="form-control", placeholder="Enter embed code or location URL") }}
         </div>
+        <div class="mb-3">
+            {{ form.version.label(class="form-label") }}
+            {{ form.version(class="form-control", placeholder="e.g., 1.0, 2.1") }}
+        </div>
         {{ form.submit(class="btn btn-primary") }}
         <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    CKEDITOR.replace('overview');
+    CKEDITOR.replace('itinerary');
+    CKEDITOR.replace('itinerary_days');
+    CKEDITOR.replace('inclusions');
+    CKEDITOR.replace('exclusions');
+    CKEDITOR.replace('highlights');
+    CKEDITOR.replace('accommodation_details');
+    CKEDITOR.replace('transportation_details');
+    CKEDITOR.replace('cancellation_policy');
+    CKEDITOR.replace('terms_conditions');
+});
+</script>
 {% endblock %}
