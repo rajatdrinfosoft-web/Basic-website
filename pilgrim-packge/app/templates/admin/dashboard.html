@@ -264,6 +264,9 @@
                 <td>
                     <a href="{{ url_for('admin.edit_page', id=page.id) }}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{{ url_for('admin.delete_page', id=page.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    {% if page.slug == 'contact' %}
+                    <a href="{{ url_for('main.contact') }}" target="_blank" class="btn btn-sm btn-info">View Page</a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

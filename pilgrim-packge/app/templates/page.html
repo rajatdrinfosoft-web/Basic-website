@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page.title if page else 'Page' }} - Pilgrim Packages{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-white px-3 py-2 rounded">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ page.title if page else 'Page' }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-4">
+                    {% if page %}
+                        <h1 class="card-title mb-4 text-center">{{ page.title }}</h1>
+                        <div class="content">
+                            {{ page.content | safe }}
+                        </div>
+                    {% else %}
+                        <h1 class="card-title mb-4 text-center">Page Not Found</h1>
+                        <p class="text-center">The page you're looking for doesn't exist or is not active.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

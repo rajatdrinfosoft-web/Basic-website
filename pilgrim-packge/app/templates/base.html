@@ -12,6 +12,8 @@
 <body>
     {% include 'nav.html' %}
 
+    {% block fullwidth %}{% endblock %}
+
     <main class="container" style="width:100%">
         {% block content %}{% endblock %}
     </main>

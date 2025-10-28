@@ -60,11 +60,11 @@ def packages():
     # Price range filter
     if price_range:
         if price_range == 'below_10000':
-            query = query.filter(Package.price < '₹10,000')
+            query = query.filter(Package.price < 10000)
         elif price_range == '10000_25000':
-            query = query.filter(Package.price.between('₹10,000', '₹25,000'))
+            query = query.filter(Package.price.between(10000, 25000))
         elif price_range == 'above_50000':
-            query = query.filter(Package.price > '₹50,000')
+            query = query.filter(Package.price > 50000)
 
     # Duration filter
     if duration:
@@ -135,3 +135,17 @@ def faq():
 @main.route('/offline')
 def offline():
     return render_template('offline.html')
+
+@main.route('/terms-and-conditions')
+def terms_and_conditions():
+    page = Page.query.filter_by(slug='term-and-conditions', is_active=True).first()
+    if page:
+        return render_template('page.html', page=page)
+    return render_template('page.html')
+
+@main.route('/privacy-policy')
+def privacy_policy():
+    page = Page.query.filter_by(slug='privacy-policy', is_active=True).first()
+    if page:
+        return render_template('page.html', page=page)
+    return render_template('page.html')

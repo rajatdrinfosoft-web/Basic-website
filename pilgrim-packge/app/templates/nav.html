@@ -27,10 +27,10 @@
                         Company
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#about-us">About</a></li>
-                        <li><a class="dropdown-item" href="#contact-us">Contact</a></li>
-                        <li><a class="dropdown-item" href="#">Term & Conditions</a></li>
-                        <li><a class="dropdown-item" href="#">Privacy policy</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('main.about') }}">About</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('main.contact') }}">Contact</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('main.terms_and_conditions') }}">Term & Conditions</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('main.privacy_policy') }}">Privacy policy</a></li>
                     </ul>
                 </li>
             </ul>

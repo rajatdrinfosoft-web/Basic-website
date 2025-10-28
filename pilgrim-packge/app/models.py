@@ -17,7 +17,7 @@ class Package(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False, index=True)
     description = db.Column(db.Text)
-    price = db.Column(db.String(20), index=True)
+    price = db.Column(db.Integer, index=True)
     rating = db.Column(db.String(10))
     image = db.Column(db.String(255))
     gallery_images = db.Column(db.Text)  # Comma-separated image URLs

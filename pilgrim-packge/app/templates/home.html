@@ -2,36 +2,39 @@
 
 {% block title %}Home - Pilgrim Packages{% endblock %}
 
+{% block fullwidth %}
+<!-- Main Carousel -->
+<div class="container-fluid p-0">
+    <div id="carouselExampleAutoplaying" class="carousel slide w-100" data-bs-ride="carousel" style="max-width:100vw;">
+        <div class="carousel-inner">
+            {% for banner in banners %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                <img src="{{ banner.image }}" class="d-block w-100" alt="{{ banner.title }}" loading="{% if loop.first %}eager{% else %}lazy{% endif %}" {% if loop.first %}fetchpriority="high"{% endif %}>
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>{{ banner.title }}</h5>
+                    {% if banner.link %}
+                    <a href="{{ banner.link }}" class="btn btn-primary">Learn More</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 
-
-<!-- Main Carousel -->
-<div id="carouselExampleAutoplaying" class="carousel slide w-100" data-bs-ride="carousel" style="max-width:100vw;">
-    <div class="carousel-inner">
-        {% for banner in banners %}
-        <div class="carousel-item {% if loop.first %}active{% endif %}">
-            <img src="{{ banner.image }}" class="d-block w-100" alt="{{ banner.title }}" loading="{% if loop.first %}eager{% else %}lazy{% endif %}" {% if loop.first %}fetchpriority="high"{% endif %}>
-            <div class="carousel-caption d-none d-md-block">
-                <h5>{{ banner.title }}</h5>
-                {% if banner.link %}
-                <a href="{{ banner.link }}" class="btn btn-primary">Learn More</a>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
-</div>
-
 <!-- Header -->
-<header class="bg-primary-subtle text-dark text-center mb-4 rounded-bottom">
+<header class="bg-primary-subtle text-dark text-center mb-4 rounded-bottom py-3">
     <div class="container">
         <h1 class="fw-bold">Welcome to Pilgrim Packages</h1>
         <p class="lead">Affordable Tour Packages for Spiritual Journeys Across India</p>
@@ -146,41 +149,12 @@
     </div>
 </section>
 
-
-<!-- Contact -->
-<section id="contact-us" class="container mt-4 mb-5">
+<!-- Contact Form -->
+<section id="contact-form" class="container mt-4 mb-5">
     <div class="row">
-        <div class="col-lg-10 mx-auto">
-            <h2 class="text-center mb-4">Contact Us</h2>
+        <div class="col-lg-8 mx-auto">
+            <h2 class="text-center mb-4">Send us a Message</h2>
             <p class="lead text-center mb-5">Get in touch for your spiritual journey planning.</p>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <h3>Contact Information</h3>
-                    <p><strong>Office Address:</strong><br>
-                    Office No. 1707, 17th Floor Cloud 9 Tower I,<br>
-                    Vaishali, Ghaziabad, Delhi - NCR - 201010</p>
-
-                    <p><strong>Phone:</strong><br>
-                    +91 8282824999<br>
-                    +91 8282824555</p>
-
-                    <p><strong>Email:</strong><br>
-                    sales@pilgrimpackages.com</p>
-                </div>
-                <div class="col-md-6">
-                    <h3>Business Hours</h3>
-                    <p>Monday - Saturday: 9:00 AM - 6:00 PM<br>
-                    Sunday: Closed</p>
-
-                    <h3>Follow Us</h3>
-                    <p>Stay connected for updates on new packages and spiritual events.</p>
-                </div>
-            </div>
-
-            <hr class="my-5">
-
-            <h3 class="text-center mb-4">Send us a Message</h3>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -244,6 +218,5 @@
         </div>
     </div>
 </section>
-
 
 {% endblock %}

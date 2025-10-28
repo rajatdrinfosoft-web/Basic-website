@@ -6,6 +6,7 @@ from .models import Package, Event, Contact, Page, Banner, FAQ, Testimonial, SEO
 from .forms import PackageForm, EventForm, PageForm, BannerForm, FAQForm, TestimonialForm, SEOConfigForm, LanguageForm
 from io import BytesIO
 from sqlalchemy import func
+import bleach
 
 admin = Blueprint('admin', __name__)
 
@@ -263,10 +264,16 @@ def duplicate_package(id):
 def new_page():
     form = PageForm()
     if form.validate_on_submit():
+        # Sanitize HTML content to prevent XSS
+        sanitized_content = bleach.clean(
+            form.content.data,
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote'],
+            attributes={'a': ['href', 'title']}
+        )
         page = Page(
             slug=form.slug.data,
             title=form.title.data,
-            content=form.content.data,
+            content=sanitized_content,
             meta_title=form.meta_title.data,
             meta_description=form.meta_description.data,
             is_active=form.is_active.data
@@ -283,7 +290,14 @@ def edit_page(id):
     page = Page.query.get_or_404(id)
     form = PageForm(obj=page)
     if form.validate_on_submit():
+        # Sanitize HTML content to prevent XSS
+        sanitized_content = bleach.clean(
+            form.content.data,
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote'],
+            attributes={'a': ['href', 'title']}
+        )
         form.populate_obj(page)
+        page.content = sanitized_content
         db.session.commit()
         flash('Page updated successfully!')
         return redirect(url_for('admin.dashboard'))
