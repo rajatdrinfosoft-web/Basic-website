@@ -267,8 +267,8 @@ def new_page():
         # Sanitize HTML content to prevent XSS
         sanitized_content = bleach.clean(
             form.content.data,
-            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote'],
-            attributes={'a': ['href', 'title']}
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
         )
         page = Page(
             slug=form.slug.data,
@@ -293,8 +293,8 @@ def edit_page(id):
         # Sanitize HTML content to prevent XSS
         sanitized_content = bleach.clean(
             form.content.data,
-            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote'],
-            attributes={'a': ['href', 'title']}
+            tags=['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'img', 'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot', 'span', 'div'],
+            attributes={'a': ['href', 'title'], 'img': ['src', 'alt', 'title'], 'table': ['class'], 'tr': ['class'], 'td': ['class'], 'th': ['class'], 'span': ['class'], 'div': ['class']}
         )
         form.populate_obj(page)
         page.content = sanitized_content
