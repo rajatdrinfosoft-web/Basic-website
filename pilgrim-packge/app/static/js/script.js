@@ -2,6 +2,16 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Pilgrim Packages loaded');
 
+    //auto alert close
+    window.setTimeout(function() {
+    let alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        let bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    });
+    }, 2000); // 3 seconds
+
+
     // Theme Toggle Functionality
     const themeToggle = document.createElement('button');
     themeToggle.innerHTML = '🌙';

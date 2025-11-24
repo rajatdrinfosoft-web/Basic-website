@@ -3,7 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block head %}
-<script src="https://cdn.ckeditor.com/4.25.1-lts/standard/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/40.2.0/classic/ckeditor.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -110,16 +110,24 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    CKEDITOR.replace('overview');
-    CKEDITOR.replace('itinerary');
-    CKEDITOR.replace('itinerary_days');
-    CKEDITOR.replace('inclusions');
-    CKEDITOR.replace('exclusions');
-    CKEDITOR.replace('highlights');
-    CKEDITOR.replace('accommodation_details');
-    CKEDITOR.replace('transportation_details');
-    CKEDITOR.replace('cancellation_policy');
-    CKEDITOR.replace('terms_conditions');
+    const editors = [
+        'overview', 'itinerary', 'itinerary_days', 'inclusions', 'exclusions',
+        'highlights', 'accommodation_details', 'transportation_details',
+        'cancellation_policy', 'terms_conditions'
+    ];
+
+    editors.forEach(id => {
+        const textarea = document.getElementById(id);
+        if (textarea) {
+            ClassicEditor
+                .create(textarea)
+                .catch(error => {
+                    console.error('Error initializing CKEditor for ' + id, error);
+                });
+        } else {
+            console.warn('Textarea with id ' + id + ' not found.');
+        }
+    });
 });
 </script>
 {% endblock %}
