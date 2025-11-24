@@ -1,5 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, PasswordField, BooleanField, IntegerField, SelectField
+from wtforms import (
+    StringField,
+    TextAreaField,
+    SubmitField,
+    PasswordField,
+    BooleanField,
+    IntegerField,
+    SelectField,
+)
+from wtforms.fields import DateField
 from wtforms.validators import DataRequired, Length, Email, Optional, NumberRange
 
 class LoginForm(FlaskForm):
@@ -98,15 +107,89 @@ class LanguageForm(FlaskForm):
 
 # Form for filtering and searching queries in inbox
 class QueryFilterForm(FlaskForm):
-    status = SelectField('Status', choices=[('', 'All'), ('Open', 'Open'), ('In Progress', 'In Progress'), ('Resolved', 'Resolved'), ('Closed', 'Closed')], default='')
+    status = SelectField(
+        'Status',
+        choices=[
+            ('', 'All'),
+            ('Open', 'Open'),
+            ('Pending', 'Pending'),
+            ('In Progress', 'In Progress'),
+            ('Responded', 'Responded'),
+            ('Resolved', 'Resolved'),
+            ('Closed', 'Closed'),
+        ],
+        default='',
+    )
     query_type = StringField('Query Type')
+    priority = SelectField(
+        'Priority',
+        choices=[('', 'All'), ('Normal', 'Normal'), ('Urgent', 'Urgent'), ('Escalated', 'Escalated')],
+        default='',
+    )
     assigned_staff_id = SelectField('Assigned Staff', coerce=int, choices=[], default=0)
+    from_date = DateField('From', validators=[Optional()])
+    to_date = DateField('To', validators=[Optional()])
+    sla_state = SelectField(
+        'SLA',
+        choices=[('all', 'All'), ('overdue', 'Overdue'), ('due_soon', 'Due soon'), ('met', 'Met')],
+        default='all',
+    )
     search = StringField('Search')
     submit = SubmitField('Filter')
 
 # Form for updating a query (assignment, status, priority)
 class QueryUpdateForm(FlaskForm):
     assigned_staff_id = SelectField('Assign Staff', coerce=int, choices=[], validators=[Optional()])
-    status = SelectField('Status', choices=[('Open', 'Open'), ('In Progress', 'In Progress'), ('Resolved', 'Resolved'), ('Closed', 'Closed')], validators=[DataRequired()])
-    priority = SelectField('Priority', choices=[('Normal', 'Normal'), ('Urgent', 'Urgent'), ('Escalated', 'Escalated')], validators=[DataRequired()])
+    status = SelectField(
+        'Status',
+        choices=[
+            ('Open', 'Open'),
+            ('Pending', 'Pending'),
+            ('In Progress', 'In Progress'),
+            ('Responded', 'Responded'),
+            ('Resolved', 'Resolved'),
+            ('Closed', 'Closed'),
+        ],
+        validators=[DataRequired()],
+    )
+    priority = SelectField(
+        'Priority',
+        choices=[('Normal', 'Normal'), ('Urgent', 'Urgent'), ('Escalated', 'Escalated')],
+        validators=[DataRequired()],
+    )
     submit = SubmitField('Update Query')
+
+
+class QueryResponseForm(FlaskForm):
+    template_id = SelectField('Use Template', coerce=int, validators=[Optional()], choices=[], default=0)
+    channel = SelectField(
+        'Channel',
+        choices=[('email', 'Email'), ('phone', 'Phone Call'), ('chat', 'Chat / WhatsApp')],
+        default='email',
+    )
+    subject = StringField('Subject', validators=[DataRequired(), Length(max=200)])
+    body = TextAreaField('Message', validators=[DataRequired()])
+    attachment_urls = TextAreaField('Attachment Links (comma separated)', validators=[Optional()])
+    send_email = BooleanField('Send email to customer', default=True)
+    log_internal_note = BooleanField('Log as internal note', default=False)
+    submit = SubmitField('Send Response')
+
+
+class QueryTemplateForm(FlaskForm):
+    name = StringField('Template Name', validators=[DataRequired(), Length(max=150)])
+    category = StringField('Category', validators=[Optional(), Length(max=100)])
+    subject = StringField('Subject', validators=[DataRequired(), Length(max=200)])
+    body = TextAreaField('Message', validators=[DataRequired()])
+    is_active = BooleanField('Active', default=True)
+    submit = SubmitField('Save Template')
+
+
+class QueryEscalationForm(FlaskForm):
+    escalate_to = StringField('Escalate To (name or team)', validators=[Optional(), Length(max=150)])
+    reason = TextAreaField('Reason', validators=[DataRequired()])
+    priority = SelectField(
+        'Priority after escalation',
+        choices=[('Urgent', 'Urgent'), ('Escalated', 'Escalated')],
+        default='Escalated',
+    )
+    submit = SubmitField('Escalate')

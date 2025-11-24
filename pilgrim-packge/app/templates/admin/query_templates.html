@@ -1,0 +1,80 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Response Templates{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="mb-0">Response Templates</h1>
+            <p class="text-muted mb-0">Create reusable replies for booking, payment, cancellation and FAQ scenarios.</p>
+        </div>
+        <a href="{{ url_for('admin.query_inbox') }}" class="btn btn-link">← Back to inbox</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header">New template</div>
+                <div class="card-body">
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.category.label(class="form-label") }}
+                            {{ form.category(class="form-control", placeholder="Booking / Payment / Cancellation") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.subject.label(class="form-label") }}
+                            {{ form.subject(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.body.label(class="form-label") }}
+                            {{ form.body(class="form-control", rows="6") }}
+                        </div>
+                        <div class="form-check mb-3">
+                            {{ form.is_active(class="form-check-input", id="is_active") }}
+                            <label class="form-check-label" for="is_active">Active</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">{{ form.submit.label.text }}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header">Existing templates ({{ templates|length }})</div>
+                <div class="card-body">
+                    {% if templates %}
+                        <div class="list-group">
+                            {% for template in templates %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="mb-1">{{ template.name }}</h5>
+                                            <p class="text-muted mb-2">{{ template.category or 'Uncategorized' }} • Updated {{ template.updated_at.strftime('%Y-%m-%d') }}</p>
+                                        </div>
+                                        <form method="post" action="{{ url_for('admin.toggle_query_template', template_id=template.id) }}">
+                                            {{ csrf_token() }}
+                                            <button class="btn btn-sm {{ 'btn-outline-danger' if template.is_active else 'btn-outline-success' }}">
+                                                {{ 'Disable' if template.is_active else 'Activate' }}
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <p class="mb-0" style="white-space: pre-wrap;">{{ template.body[:400] }}{% if template.body|length > 400 %}…{% endif %}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No templates yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

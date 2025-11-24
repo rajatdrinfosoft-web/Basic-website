@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import Package, Event, Contact, Page, Banner, FAQ, Testimonial, db
+from .models import Package, Event, Page, Banner, FAQ, Testimonial, Query, db
 from .forms import ContactForm
 from . import cache
 
@@ -13,15 +13,17 @@ def home():
     testimonials = Testimonial.query.filter_by(is_active=True).order_by(Testimonial.created_at.desc()).limit(3).all()
     form = ContactForm()
     if form.validate_on_submit():
-        contact = Contact(
-            name=form.name.data,
-            email=form.email.data,
-            phone=form.phone.data,
-            message=form.message.data
+        query = Query(
+            customer_name=form.name.data,
+            customer_email=form.email.data,
+            customer_phone=form.phone.data,
+            message=form.message.data,
+            query_type='General Inquiry',
+            source='home-form'
         )
-        db.session.add(contact)
+        db.session.add(query)
         db.session.commit()
-        flash('Your message has been sent successfully!', 'success')
+        flash('Thanks! Your query has been sent to our team.', 'success')
         return redirect(url_for('main.home'))
     return render_template('home.html', cards=cards, events=events, banners=banners, testimonials=testimonials, form=form)
 
@@ -115,15 +117,17 @@ def contact():
     page = Page.query.filter_by(slug='contact', is_active=True).first()
     form = ContactForm()
     if form.validate_on_submit():
-        contact = Contact(
-            name=form.name.data,
-            email=form.email.data,
-            phone=form.phone.data,
-            message=form.message.data
+        query = Query(
+            customer_name=form.name.data,
+            customer_email=form.email.data,
+            customer_phone=form.phone.data,
+            message=form.message.data,
+            query_type='Contact Form',
+            source='contact-page'
         )
-        db.session.add(contact)
+        db.session.add(query)
         db.session.commit()
-        flash('Your message has been sent successfully!', 'success')
+        flash('Your query has been sent successfully!', 'success')
         return redirect(url_for('main.contact'))
     return render_template('contact.html', form=form, page=page)
 

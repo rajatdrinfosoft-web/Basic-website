@@ -1,22 +1,69 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from flask import Blueprint, render_template, redirect, url_for, flash, request, send_file, Response
-from flask_login import login_required
-from .models import Package, Event, Contact, Page, Banner, FAQ, Query, Testimonial, SEOConfig, Language, db
-from .forms import PackageForm, EventForm, PageForm, BannerForm, FAQForm, TestimonialForm, SEOConfigForm, LanguageForm
+from datetime import datetime, timedelta
 from io import BytesIO
+
+from flask import Blueprint, render_template, redirect, url_for, flash, request, send_file, Response, current_app
+from flask_login import login_required, current_user
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 import bleach
+
+from .models import (
+    Package,
+    Event,
+    Contact,
+    Page,
+    Banner,
+    FAQ,
+    Query,
+    QueryResponse,
+    QueryResponseTemplate,
+    Testimonial,
+    SEOConfig,
+    Language,
+    User,
+    db,
+)
+from .forms import (
+    PackageForm,
+    EventForm,
+    PageForm,
+    BannerForm,
+    FAQForm,
+    TestimonialForm,
+    SEOConfigForm,
+    LanguageForm,
+    QueryFilterForm,
+    QueryUpdateForm,
+    QueryResponseForm,
+    QueryTemplateForm,
+    QueryEscalationForm,
+)
 
 
 admin = Blueprint('admin', __name__)
+
+
+def send_query_email(query_obj, subject, body, attachments=None):
+    """
+    Placeholder email sender that logs the outbound message.
+    Replace with Flask-Mail / external provider when ready.
+    """
+    current_app.logger.info(
+        "Sending email to %s (%s) | Subject: %s | Attachments: %s",
+        query_obj.customer_name,
+        query_obj.customer_email,
+        subject,
+        attachments or [],
+    )
+
 
 @admin.route('/')
 @login_required
 def dashboard():
     packages = Package.query.all()
     events = Event.query.all()
-    contacts = Contact.query.order_by(Contact.created_at.desc()).all()
     banners = Banner.query.all()
     testimonials = Testimonial.query.all()
     pages = Page.query.all()
@@ -25,105 +72,363 @@ def dashboard():
     # Analytics data
     total_packages = len(packages)
     total_events = len(events)
-    total_contacts = len(contacts)
     total_banners = len(banners)
     total_testimonials = len(testimonials)
-
-    # Recent contacts (last 7 days)
-    from datetime import datetime, timedelta
-    seven_days_ago = datetime.utcnow() - timedelta(days=7)
-    recent_contacts = Contact.query.filter(Contact.created_at >= seven_days_ago).count()
 
     # Package destinations count
     destination_counts = db.session.query(Package.destination, func.count(Package.id)).group_by(Package.destination).all()
     destinations = [d[0] for d in destination_counts]
     dest_counts = [d[1] for d in destination_counts]
 
-    # Contact messages over time (last 30 days)
-    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    contact_dates = db.session.query(func.date(Contact.created_at), func.count(Contact.id)).filter(Contact.created_at >= thirty_days_ago).group_by(func.date(Contact.created_at)).all()
-    contact_dates = sorted(contact_dates, key=lambda x: x[0])
-    dates = [str(d[0]) for d in contact_dates]
-    contact_counts = [d[1] for d in contact_dates]
-
-    # New: Query analytics
+    # Query analytics
+    now = datetime.utcnow()
     query_counts = db.session.query(Query.status, func.count(Query.id)).group_by(Query.status).all()
     status_labels = [qc[0] for qc in query_counts]
     status_counts = [qc[1] for qc in query_counts]
+    total_queries = sum(status_counts)
+    overdue_queries = (
+        Query.query.filter(
+            Query.sla_deadline != None,  # noqa: E711
+            Query.sla_deadline < now,
+            Query.status.notin_(('Resolved', 'Closed')),
+        ).count()
+    )
+    due_soon_queries = (
+        Query.query.filter(
+            Query.sla_deadline != None,  # noqa: E711
+            Query.sla_deadline.between(now, now + timedelta(hours=2)),
+            Query.status.notin_(('Resolved', 'Closed')),
+        ).count()
+    )
+    unassigned_queries = Query.query.filter(Query.assigned_staff_id.is_(None)).count()
+    query_type_rows = (
+        db.session.query(Query.query_type, func.count(Query.id))
+        .group_by(Query.query_type)
+        .filter(Query.query_type != None)  # noqa: E711
+        .all()
+    )
+    query_type_labels = [row[0] for row in query_type_rows]
+    query_type_counts = [row[1] for row in query_type_rows]
 
-    return render_template('admin/dashboard.html', packages=packages, events=events, contacts=contacts,
+    avg_first_response = (
+        db.session.query(
+            func.avg(
+                func.extract('epoch', Query.first_response_at - Query.created_at) / 60.0
+            )
+        )
+        .filter(Query.first_response_at != None)  # noqa: E711
+        .scalar()
+    )
+    avg_resolution_hours = (
+        db.session.query(
+            func.avg(func.extract('epoch', Query.resolved_at - Query.created_at) / 3600.0)
+        )
+        .filter(Query.resolved_at != None)  # noqa: E711
+        .scalar()
+    )
+
+    staff_performance_rows = (
+        db.session.query(
+            User.username,
+            func.count(Query.id),
+            func.avg(func.extract('epoch', Query.resolved_at - Query.created_at) / 3600.0),
+        )
+        .outerjoin(Query, Query.assigned_staff_id == User.id)
+        .group_by(User.username)
+        .all()
+    )
+    staff_performance = [
+        {
+            'name': row[0],
+            'tickets': row[1],
+            'avg_resolution': round(row[2], 2) if row[2] else None,
+        }
+        for row in staff_performance_rows
+    ]
+
+    return render_template('admin/dashboard.html', packages=packages, events=events,
                          banners=banners, testimonials=testimonials, pages=pages, faqs=faqs,
-                         total_packages=total_packages, total_events=total_events, total_contacts=total_contacts,
+                         total_packages=total_packages, total_events=total_events,
                          total_banners=total_banners, total_testimonials=total_testimonials,
-                         recent_contacts=recent_contacts, destinations=destinations, dest_counts=dest_counts,
-                         dates=dates, contact_counts=contact_counts,
-                         status_labels=status_labels, status_counts=status_counts)
+                         destinations=destinations, dest_counts=dest_counts,
+                         status_labels=status_labels, status_counts=status_counts,
+                         total_queries=total_queries, overdue_queries=overdue_queries,
+                         due_soon_queries=due_soon_queries, unassigned_queries=unassigned_queries,
+                         query_type_labels=query_type_labels, query_type_counts=query_type_counts,
+                         avg_first_response=round(avg_first_response, 1) if avg_first_response else None,
+                         avg_resolution_hours=round(avg_resolution_hours, 1) if avg_resolution_hours else None,
+                         staff_performance=staff_performance)
 
 # Query inbox route with filters and search
 @admin.route('/queries')
 @login_required
 def query_inbox():
-    from datetime import datetime
     from sqlalchemy import or_
 
-    # Get filter parameters
-    status = request.args.get('status', None)
-    query_type = request.args.get('query_type', None)
-    assigned_staff_id = request.args.get('assigned_staff', None)
-    search = request.args.get('search', None)
     page = request.args.get('page', 1, type=int)
-    per_page = 10
+    per_page = request.args.get('per_page', 15, type=int)
+    status = request.args.get('status')
+    query_type = request.args.get('query_type')
+    priority = request.args.get('priority')
+    assigned_staff_id = request.args.get('assigned_staff')
+    search = request.args.get('search')
+    from_date = request.args.get('from_date')
+    to_date = request.args.get('to_date')
+    sla_filter = request.args.get('sla', 'all')
 
-    query = Query.query
+    now = datetime.utcnow()
+    query = Query.query.options(joinedload(Query.assigned_staff))
 
     if status:
         query = query.filter(Query.status == status)
     if query_type:
         query = query.filter(Query.query_type.ilike(f'%{query_type}%'))
+    if priority:
+        query = query.filter(Query.priority == priority)
     if assigned_staff_id:
-        query = query.filter(Query.assigned_staff_id == assigned_staff_id)
+        try:
+            assigned_staff_value = int(assigned_staff_id)
+            query = query.filter(Query.assigned_staff_id == assigned_staff_value)
+        except (TypeError, ValueError):
+            flash('Invalid staff filter supplied.', 'warning')
+    if from_date:
+        try:
+            start_dt = datetime.strptime(from_date, '%Y-%m-%d')
+            query = query.filter(Query.created_at >= start_dt)
+        except ValueError:
+            flash('Invalid start date filter', 'warning')
+    if to_date:
+        try:
+            end_dt = datetime.strptime(to_date, '%Y-%m-%d') + timedelta(days=1)
+            query = query.filter(Query.created_at < end_dt)
+        except ValueError:
+            flash('Invalid end date filter', 'warning')
+    if sla_filter == 'overdue':
+        query = query.filter(
+            Query.sla_deadline != None,  # noqa: E711
+            Query.sla_deadline < now,
+            Query.status.notin_(('Resolved', 'Closed')),
+        )
+    elif sla_filter == 'due_soon':
+        query = query.filter(
+            Query.sla_deadline != None,  # noqa: E711
+            Query.sla_deadline.between(now, now + timedelta(hours=2)),
+            Query.status.notin_(('Resolved', 'Closed')),
+        )
+    elif sla_filter == 'met':
+        query = query.filter(
+            Query.sla_deadline != None,  # noqa: E711
+            Query.sla_deadline >= now,
+            Query.status.in_(('Responded', 'Resolved', 'Closed')),
+        )
     if search:
         query = query.filter(
             or_(
                 Query.customer_name.ilike(f'%{search}%'),
                 Query.customer_email.ilike(f'%{search}%'),
-                Query.message.ilike(f'%{search}%')
+                Query.ticket_number.ilike(f'%{search}%'),
+                Query.message.ilike(f'%{search}%'),
             )
         )
 
-    # Order by newest first
-    query = query.order_by(Query.created_at.desc())
+    query = query.order_by(Query.priority.desc(), Query.created_at.desc())
 
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     queries = pagination.items
 
-    # Get all staff for assignment filter dropdown
-    staff_list = User.query.all()
+    staff_list = User.query.order_by(User.username).all()
+    query_type_rows = (
+        db.session.query(Query.query_type).filter(Query.query_type != None).distinct().order_by(Query.query_type).all()  # noqa: E711
+    )
+    available_query_types = [row[0] for row in query_type_rows]
 
-    return render_template('admin/query_inbox.html', queries=queries, pagination=pagination, staff_list=staff_list,
-                          status=status, query_type=query_type, assigned_staff_id=assigned_staff_id, search=search)
+    status_breakdown = dict(db.session.query(Query.status, func.count(Query.id)).group_by(Query.status).all())
+    priority_breakdown = dict(db.session.query(Query.priority, func.count(Query.id)).group_by(Query.priority).all())
+    total_tickets = sum(status_breakdown.values()) if status_breakdown else 0
+    total_priority = sum(priority_breakdown.values()) if priority_breakdown else 0
+    sla_overview = {
+        'overdue': Query.query.filter(
+            Query.sla_deadline != None,  # noqa: E711
+            Query.sla_deadline < now,
+            Query.status.notin_(('Resolved', 'Closed')),
+        ).count(),
+        'due_soon': Query.query.filter(
+            Query.sla_deadline != None,  # noqa: E711
+            Query.sla_deadline.between(now, now + timedelta(hours=2)),
+            Query.status.notin_(('Resolved', 'Closed')),
+        ).count(),
+        'met': Query.query.filter(
+            Query.sla_deadline != None,  # noqa: E711
+            Query.sla_deadline >= now,
+            Query.status.in_(('Responded', 'Resolved', 'Closed')),
+        ).count(),
+    }
+
+    return render_template(
+        'admin/query_inbox.html',
+        queries=queries,
+        pagination=pagination,
+        staff_list=staff_list,
+        status=status,
+        query_type=query_type,
+        available_query_types=available_query_types,
+        assigned_staff_id=assigned_staff_id,
+        search=search,
+        priority=priority,
+        from_date=from_date,
+        to_date=to_date,
+        sla_filter=sla_filter,
+        per_page=per_page,
+        status_breakdown=status_breakdown,
+        priority_breakdown=priority_breakdown,
+        sla_overview=sla_overview,
+        total_tickets=total_tickets,
+        total_priority=total_priority,
+    )
 
 # Query detail route to view and update query
 @admin.route('/query/<int:query_id>', methods=['GET', 'POST'])
 @login_required
 def query_detail(query_id):
-    query_obj = Query.query.get_or_404(query_id)
-    staff_list = User.query.all()
+    query_obj = (
+        Query.query.options(
+            joinedload(Query.responses).joinedload(QueryResponse.staff),
+            joinedload(Query.assigned_staff),
+        )
+        .filter_by(id=query_id)
+        .first_or_404()
+    )
+    staff_list = User.query.order_by(User.username).all()
+    templates = QueryResponseTemplate.query.filter_by(is_active=True).order_by(QueryResponseTemplate.name).all()
+    related_queries = (
+        Query.query.filter(
+            Query.customer_email == query_obj.customer_email,
+            Query.id != query_obj.id,
+        )
+        .order_by(Query.created_at.desc())
+        .limit(5)
+        .all()
+    )
 
-    if request.method == 'POST':
-        # Update query details
-        assigned_staff_id = request.form.get('assigned_staff_id')
-        status = request.form.get('status')
-        priority = request.form.get('priority')
-        # Sanitize message updates if needed; for now, only allow update on status assignment and priority
-        query_obj.assigned_staff_id = assigned_staff_id if assigned_staff_id else None
-        query_obj.status = status
-        query_obj.priority = priority
+    update_form = QueryUpdateForm(obj=query_obj)
+    update_form.assigned_staff_id.choices = [(0, 'Unassigned')] + [(staff.id, staff.username) for staff in staff_list]
+    update_form.assigned_staff_id.data = query_obj.assigned_staff_id or 0
+
+    response_form = QueryResponseForm()
+    response_form.template_id.choices = [(0, 'Select template')] + [(t.id, t.name) for t in templates]
+    if response_form.template_id.data is None:
+        response_form.template_id.data = 0
+    if not response_form.subject.data:
+        response_form.subject.data = f"Re: {query_obj.query_type or 'Your query'}"
+
+    escalation_form = QueryEscalationForm()
+
+    action = request.form.get('action')
+    if request.method == 'POST' and action == 'update':
+        if update_form.validate_on_submit():
+            staff_id = update_form.assigned_staff_id.data or None
+            query_obj.assigned_staff_id = staff_id if staff_id else None
+            query_obj.status = update_form.status.data
+            query_obj.priority = update_form.priority.data
+            if query_obj.status in ('Responded', 'Resolved') and not query_obj.first_response_at:
+                query_obj.first_response_at = datetime.utcnow()
+            if query_obj.status in ('Resolved', 'Closed'):
+                query_obj.resolved_at = datetime.utcnow()
+            db.session.commit()
+            flash('Query updated successfully.', 'success')
+            return redirect(url_for('admin.query_detail', query_id=query_id))
+    elif request.method == 'POST' and action == 'respond':
+        if response_form.validate_on_submit():
+            template_id = response_form.template_id.data or None
+            if template_id == 0:
+                template_id = None
+            attachments = []
+            if response_form.attachment_urls.data:
+                attachments = [item.strip() for item in response_form.attachment_urls.data.split(',') if item.strip()]
+
+            responding_staff_id = current_user.id if current_user.is_authenticated else query_obj.assigned_staff_id
+            channel = 'internal' if response_form.log_internal_note.data else response_form.channel.data
+            response_entry = QueryResponse(
+                query_id=query_obj.id,
+                staff_id=responding_staff_id,
+                subject=response_form.subject.data,
+                body=response_form.body.data,
+                channel=channel,
+                attachment_urls=",".join(attachments) if attachments else None,
+                used_template_id=template_id,
+                status_after=query_obj.status,
+            )
+            query_obj.responses.append(response_entry)
+            query_obj.last_contact_channel = response_form.channel.data
+            query_obj.last_response_summary = response_form.body.data[:500]
+            if not query_obj.first_response_at:
+                query_obj.first_response_at = datetime.utcnow()
+            query_obj.status = 'Responded' if query_obj.status in ('Open', 'Pending', 'In Progress') else query_obj.status
+            query_obj.updated_at = datetime.utcnow()
+            db.session.add(response_entry)
+            db.session.commit()
+
+            if response_form.send_email.data and not response_form.log_internal_note.data:
+                send_query_email(query_obj, response_entry.subject, response_entry.body, attachments)
+
+            flash('Response recorded successfully.', 'success')
+            return redirect(url_for('admin.query_detail', query_id=query_id))
+    elif request.method == 'POST' and action == 'escalate':
+        if escalation_form.validate_on_submit():
+            query_obj.priority = escalation_form.priority.data
+            query_obj.status = 'In Progress'
+            query_obj.escalated_at = datetime.utcnow()
+            query_obj.escalation_reason = escalation_form.reason.data
+            db.session.commit()
+            flash('Query escalated.', 'info')
+            return redirect(url_for('admin.query_detail', query_id=query_id))
+
+    templates_payload = [
+        {'id': t.id, 'subject': t.subject, 'body': t.body, 'category': t.category} for t in templates
+    ]
+
+    return render_template(
+        'admin/query_detail.html',
+        query=query_obj,
+        staff_list=staff_list,
+        update_form=update_form,
+        response_form=response_form,
+        escalation_form=escalation_form,
+        templates=templates,
+        related_queries=related_queries,
+        templates_payload=templates_payload,
+    )
+
+# Query response templates management
+@admin.route('/query-templates', methods=['GET', 'POST'])
+@login_required
+def manage_query_templates():
+    form = QueryTemplateForm()
+    templates = QueryResponseTemplate.query.order_by(QueryResponseTemplate.updated_at.desc()).all()
+    if form.validate_on_submit():
+        template = QueryResponseTemplate(
+            name=form.name.data,
+            category=form.category.data,
+            subject=form.subject.data,
+            body=form.body.data,
+            is_active=form.is_active.data,
+        )
+        db.session.add(template)
         db.session.commit()
-        flash('Query updated successfully.')
-        return redirect(url_for('admin.query_detail', query_id=query_id))
+        flash('Template saved successfully.', 'success')
+        return redirect(url_for('admin.manage_query_templates'))
+    return render_template('admin/query_templates.html', form=form, templates=templates)
 
-    return render_template('admin/query_detail.html', query=query_obj, staff_list=staff_list)
+
+@admin.route('/query-template/<int:template_id>/toggle', methods=['POST'])
+@login_required
+def toggle_query_template(template_id):
+    template = QueryResponseTemplate.query.get_or_404(template_id)
+    template.is_active = not template.is_active
+    db.session.commit()
+    flash(f"Template {'activated' if template.is_active else 'paused'}.", 'info')
+    return redirect(url_for('admin.manage_query_templates'))
+
 
 # Package CRUD
 @admin.route('/package/new', methods=['GET', 'POST'])

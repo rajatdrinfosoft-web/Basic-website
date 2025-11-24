@@ -30,22 +30,6 @@
             </div>
         </div>
         <div class="col-md-2">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title">Total Contacts</h5>
-                    <h2>{{ total_contacts }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card text-white bg-info">
-                <div class="card-body">
-                    <h5 class="card-title">Recent Contacts (7 days)</h5>
-                    <h2>{{ recent_contacts }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
             <div class="card text-white bg-secondary">
                 <div class="card-body">
                     <h5 class="card-title">Total Banners</h5>
@@ -75,46 +59,101 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Contact Messages (Last 30 Days)</h5>
+    </div>
+
+    <div id="queries" class="mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Query Operations</h2>
+            <a href="{{ url_for('admin.query_inbox') }}" class="btn btn-outline-primary btn-sm">Go to inbox</a>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary h-100">
+                    <div class="card-body">
+                        <p class="text-uppercase small mb-1">Open tickets</p>
+                        <h2>{{ total_queries }}</h2>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <canvas id="contactsChart"></canvas>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-danger h-100">
+                    <div class="card-body">
+                        <p class="text-uppercase small mb-1">Overdue SLA</p>
+                        <h2>{{ overdue_queries }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning h-100">
+                    <div class="card-body">
+                        <p class="text-uppercase small mb-1">Due soon (2h)</p>
+                        <h2>{{ due_soon_queries }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-secondary h-100">
+                    <div class="card-body">
+                        <p class="text-uppercase small mb-1">Unassigned</p>
+                        <h2>{{ unassigned_queries }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">Status distribution</div>
+                    <div class="card-body">
+                        <canvas id="queryStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">Query types</div>
+                    <div class="card-body">
+                        <canvas id="queryTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5>Average response time</h5>
+                        <p class="display-6">{{ avg_first_response or '—' }} <small class="text-muted">min</small></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5>Average resolution time</h5>
+                        <p class="display-6">{{ avg_resolution_hours or '—' }} <small class="text-muted">hrs</small></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5>Staff performance</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for staff in staff_performance %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>{{ staff.name }}</span>
+                                    <span class="text-muted">{{ staff.tickets }} tickets · {{ staff.avg_resolution or '—' }}h</span>
+                                </li>
+                            {% else %}
+                                <li class="list-group-item text-muted">No assignments yet.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <h2>Contact Messages</h2>
-    <div class="mb-3">
-        <a href="{{ url_for('admin.export_contacts') }}" class="btn btn-success">Export Contacts</a>
-    </div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Message</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for contact in contacts %}
-            <tr>
-                <td>{{ contact.id }}</td>
-                <td>{{ contact.name }}</td>
-                <td>{{ contact.email }}</td>
-                <td>{{ contact.phone or 'N/A' }}</td>
-                <td>{{ contact.message[:50] }}{% if contact.message|length > 50 %}...{% endif %}</td>
-                <td>{{ contact.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 
     <h2>Packages</h2>
     <div class="mb-3">
@@ -335,29 +374,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Contacts Line Chart
-    const contactsCtx = document.getElementById('contactsChart').getContext('2d');
-    const contactsChart = new Chart(contactsCtx, {
-        type: 'line',
-        data: {
-            labels: {{ dates|tojson }},
-            datasets: [{
-                label: 'Contact Messages',
-                data: {{ contact_counts|tojson }},
-                borderColor: '#36A2EB',
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
+    const queryStatusCtx = document.getElementById('queryStatusChart');
+    if (queryStatusCtx) {
+        new Chart(queryStatusCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: {{ status_labels|tojson }},
+                datasets: [{
+                    data: {{ status_counts|tojson }},
+                    backgroundColor: ['#0d6efd', '#ffc107', '#198754', '#6c757d', '#dc3545', '#20c997']
+                }]
+            }
+        });
+    }
+
+    const queryTypeCtx = document.getElementById('queryTypeChart');
+    if (queryTypeCtx) {
+        new Chart(queryTypeCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: {{ query_type_labels|tojson }},
+                datasets: [{
+                    label: 'Tickets',
+                    data: {{ query_type_counts|tojson }},
+                    backgroundColor: '#20c997'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
+    }
 });
 </script>
 {% endblock %}
