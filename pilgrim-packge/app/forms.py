@@ -95,3 +95,18 @@ class LanguageForm(FlaskForm):
     is_active = BooleanField('Active', default=True)
     is_default = BooleanField('Default Language', default=False)
     submit = SubmitField('Save Language')
+
+# Form for filtering and searching queries in inbox
+class QueryFilterForm(FlaskForm):
+    status = SelectField('Status', choices=[('', 'All'), ('Open', 'Open'), ('In Progress', 'In Progress'), ('Resolved', 'Resolved'), ('Closed', 'Closed')], default='')
+    query_type = StringField('Query Type')
+    assigned_staff_id = SelectField('Assigned Staff', coerce=int, choices=[], default=0)
+    search = StringField('Search')
+    submit = SubmitField('Filter')
+
+# Form for updating a query (assignment, status, priority)
+class QueryUpdateForm(FlaskForm):
+    assigned_staff_id = SelectField('Assign Staff', coerce=int, choices=[], validators=[Optional()])
+    status = SelectField('Status', choices=[('Open', 'Open'), ('In Progress', 'In Progress'), ('Resolved', 'Resolved'), ('Closed', 'Closed')], validators=[DataRequired()])
+    priority = SelectField('Priority', choices=[('Normal', 'Normal'), ('Urgent', 'Urgent'), ('Escalated', 'Escalated')], validators=[DataRequired()])
+    submit = SubmitField('Update Query')

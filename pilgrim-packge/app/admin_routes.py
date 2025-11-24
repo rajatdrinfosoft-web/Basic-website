@@ -2,11 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from flask import Blueprint, render_template, redirect, url_for, flash, request, send_file, Response
 from flask_login import login_required
-from .models import Package, Event, Contact, Page, Banner, FAQ, Testimonial, SEOConfig, Language, db
+from .models import Package, Event, Contact, Page, Banner, FAQ, Query, Testimonial, SEOConfig, Language, db
 from .forms import PackageForm, EventForm, PageForm, BannerForm, FAQForm, TestimonialForm, SEOConfigForm, LanguageForm
 from io import BytesIO
 from sqlalchemy import func
 import bleach
+
 
 admin = Blueprint('admin', __name__)
 
@@ -45,12 +46,84 @@ def dashboard():
     dates = [str(d[0]) for d in contact_dates]
     contact_counts = [d[1] for d in contact_dates]
 
+    # New: Query analytics
+    query_counts = db.session.query(Query.status, func.count(Query.id)).group_by(Query.status).all()
+    status_labels = [qc[0] for qc in query_counts]
+    status_counts = [qc[1] for qc in query_counts]
+
     return render_template('admin/dashboard.html', packages=packages, events=events, contacts=contacts,
                          banners=banners, testimonials=testimonials, pages=pages, faqs=faqs,
                          total_packages=total_packages, total_events=total_events, total_contacts=total_contacts,
                          total_banners=total_banners, total_testimonials=total_testimonials,
                          recent_contacts=recent_contacts, destinations=destinations, dest_counts=dest_counts,
-                         dates=dates, contact_counts=contact_counts)
+                         dates=dates, contact_counts=contact_counts,
+                         status_labels=status_labels, status_counts=status_counts)
+
+# Query inbox route with filters and search
+@admin.route('/queries')
+@login_required
+def query_inbox():
+    from datetime import datetime
+    from sqlalchemy import or_
+
+    # Get filter parameters
+    status = request.args.get('status', None)
+    query_type = request.args.get('query_type', None)
+    assigned_staff_id = request.args.get('assigned_staff', None)
+    search = request.args.get('search', None)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
+    query = Query.query
+
+    if status:
+        query = query.filter(Query.status == status)
+    if query_type:
+        query = query.filter(Query.query_type.ilike(f'%{query_type}%'))
+    if assigned_staff_id:
+        query = query.filter(Query.assigned_staff_id == assigned_staff_id)
+    if search:
+        query = query.filter(
+            or_(
+                Query.customer_name.ilike(f'%{search}%'),
+                Query.customer_email.ilike(f'%{search}%'),
+                Query.message.ilike(f'%{search}%')
+            )
+        )
+
+    # Order by newest first
+    query = query.order_by(Query.created_at.desc())
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    queries = pagination.items
+
+    # Get all staff for assignment filter dropdown
+    staff_list = User.query.all()
+
+    return render_template('admin/query_inbox.html', queries=queries, pagination=pagination, staff_list=staff_list,
+                          status=status, query_type=query_type, assigned_staff_id=assigned_staff_id, search=search)
+
+# Query detail route to view and update query
+@admin.route('/query/<int:query_id>', methods=['GET', 'POST'])
+@login_required
+def query_detail(query_id):
+    query_obj = Query.query.get_or_404(query_id)
+    staff_list = User.query.all()
+
+    if request.method == 'POST':
+        # Update query details
+        assigned_staff_id = request.form.get('assigned_staff_id')
+        status = request.form.get('status')
+        priority = request.form.get('priority')
+        # Sanitize message updates if needed; for now, only allow update on status assignment and priority
+        query_obj.assigned_staff_id = assigned_staff_id if assigned_staff_id else None
+        query_obj.status = status
+        query_obj.priority = priority
+        db.session.commit()
+        flash('Query updated successfully.')
+        return redirect(url_for('admin.query_detail', query_id=query_id))
+
+    return render_template('admin/query_detail.html', query=query_obj, staff_list=staff_list)
 
 # Package CRUD
 @admin.route('/package/new', methods=['GET', 'POST'])

@@ -107,3 +107,18 @@ class Language(db.Model):
     name = db.Column(db.String(100), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
     is_default = db.Column(db.Boolean, default=False)
+
+class Query(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    customer_name = db.Column(db.String(100), nullable=False)
+    customer_email = db.Column(db.String(100), nullable=False)
+    customer_phone = db.Column(db.String(20))
+    query_type = db.Column(db.String(100))  # e.g., booking, payment, etc.
+    status = db.Column(db.String(50), default='Open')  # Open, In Progress, Resolved, Closed
+    assigned_staff_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    priority = db.Column(db.String(50), default='Normal')  # Normal, Urgent, Escalated
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+    sla_deadline = db.Column(db.DateTime, nullable=True)
+    assigned_staff = db.relationship('User', backref='assigned_queries', lazy=True)

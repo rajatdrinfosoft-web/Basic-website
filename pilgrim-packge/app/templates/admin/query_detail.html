@@ -1,0 +1,79 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Query Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Query Details - {{ query.customer_name }}</h1>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Information
+        </div>
+        <div class="card-body">
+            <p><strong>Email:</strong> {{ query.customer_email }}</p>
+            <p><strong>Phone:</strong> {{ query.customer_phone or 'N/A' }}</p>
+            <p><strong>Type:</strong> {{ query.query_type or 'N/A' }}</p>
+            <p><strong>Status:</strong> {{ query.status }}</p>
+            <p><strong>Priority:</strong> {{ query.priority }}</p>
+            <p><strong>Assigned Staff:</strong> {{ query.assigned_staff.username if query.assigned_staff else 'Unassigned' }}</p>
+            <p><strong>Created:</strong> {{ query.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            <p><strong>Updated:</strong> {{ query.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            {% if query.sla_deadline %}
+            <p><strong>SLA Deadline:</strong> {{ query.sla_deadline.strftime('%Y-%m-%d %H:%M') }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Message
+        </div>
+        <div class="card-body">
+            <pre style="white-space: pre-wrap;">{{ query.message }}</pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Update Query
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {{ csrf_token() }}
+                <div class="mb-3">
+                    <label for="assigned_staff_id" class="form-label">Assign Staff</label>
+                    <select name="assigned_staff_id" id="assigned_staff_id" class="form-select">
+                        <option value="">Unassigned</option>
+                        {% for staff in staff_list %}
+                            <option value="{{ staff.id }}" {% if query.assigned_staff_id == staff.id %}selected{% endif %}>{{ staff.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select" required>
+                        <option value="Open" {% if query.status == 'Open' %}selected{% endif %}>Open</option>
+                        <option value="In Progress" {% if query.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Resolved" {% if query.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                        <option value="Closed" {% if query.status == 'Closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="priority" class="form-label">Priority</label>
+                    <select name="priority" id="priority" class="form-select" required>
+                        <option value="Normal" {% if query.priority == 'Normal' %}selected{% endif %}>Normal</option>
+                        <option value="Urgent" {% if query.priority == 'Urgent' %}selected{% endif %}>Urgent</option>
+                        <option value="Escalated" {% if query.priority == 'Escalated' %}selected{% endif %}>Escalated</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Query</button>
+                <a href="{{ url_for('admin.query_inbox') }}" class="btn btn-secondary ms-2">Back to Inbox</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
