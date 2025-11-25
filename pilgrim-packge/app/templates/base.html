@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,6 +8,51 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#007bff">
+
+     <meta name="description"
+        content="Affordable pilgrimage tour packages across India. Explore sacred destinations with comfort and ease. Book your spiritual journey today.">
+    <meta name="keywords"
+        content="pilgrimage tours, spiritual journeys, India tours, Amarnath Yatra, Char Dham Yatra, Golden Temple, pilgrimage packages">
+    <meta name="author" content="Pilgrim Packages">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Pilgrim Packages - Spiritual Tour Packages in India">
+    <meta property="og:description"
+        content="Affordable pilgrimage tour packages across India. Explore sacred destinations with comfort and ease. Book your spiritual journey today.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://www.pilgrimpackages.com/">
+    <meta property="og:image" content="{{ url_for('static', filename='img/logo.png') }}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="canonical" href="http://www.pilgrimpackages.com/">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" as="style"
+        onload="this.rel='stylesheet'">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Pilgrim Packages",
+      "url": "http://www.pilgrimpackages.com/",
+      "logo": "{{ url_for('static', filename='img/logo.png') }}",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+91-8282824999",
+        "contactType": "customer service",
+        "areaServed": "IN",
+        "availableLanguage": "English"
+      }
+    }
+    </script>
+
+
+
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -38,4 +83,80 @@
         }
     </script>
 </body>
-</html>
+</html> {% endcomment %}
+
+
+
+{% extends 'base.html' %}
+
+{% block title %}Home - Pilgrim Packages{% endblock %}
+
+{% block head %}
+    <!-- Page-specific meta if needed -->
+    <meta property="og:title" content="Home - Pilgrim Packages">
+{% endblock %}
+
+{% block fullwidth %}
+<!-- Main Carousel -->
+<div class="container-fluid p-0">
+    <div id="carouselExampleAutoplaying" class="carousel slide w-100" data-bs-ride="carousel" style="max-width:100vw;">
+        <div class="carousel-inner">
+            {% for banner in banners %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                <img src="{{ banner.image }}" class="d-block w-100" alt="{{ banner.title }}" loading="{% if loop.first %}eager{% else %}lazy{% endif %}" {% if loop.first %}fetchpriority="high"{% endif %}>
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>{{ banner.title }}</h5>
+                    {% if banner.link %}
+                    <a href="{{ banner.link }}" class="btn btn-primary">Learn More</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<header class="bg-primary-subtle text-dark text-center mb-4 rounded-bottom py-3">
+    <div class="container">
+        <h1 class="fw-bold">Welcome to Pilgrim Packages</h1>
+        <p class="lead">Affordable Tour Packages for Spiritual Journeys Across India</p>
+        <p>Explore sacred destinations with comfort and ease. Our expertly curated pilgrimage tours connect you to India’s rich spiritual heritage.</p>
+    </div>
+</header>
+
+<!-- Popular Tours -->
+<section id="popular-tours" class="container mb-5">
+    <header class="text-center mb-4">
+        <h2>Popular Pilgrimage Tours in India</h2>
+        <p class="lead">Explore some of the most revered pilgrimage tours that offer spiritual depth and cultural richness.</p>
+    </header>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for card in cards %}
+    <div class="col">
+        <a href="{{ url_for('main.package_detail', id=card.id) }}" style="text-decoration: none; color: inherit;">
+            <div class="card h-100">
+                <img src="{{ card.image }}" class="card-img-top" alt="{{ card.title }}" loading="lazy">
+                <div class="card-body">
+                    <h3 class="card-title text-primary">{{ card.title }}</h3>
+                    <p class="card-text">{{ card.description }}</p>
+                    <span>Ratings: {{ card.rating }}</span>
+                    <p class="card-text"><strong>Price:</strong> {{ card.price }}</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+    </div>
+</section>
+{% endblock %}
