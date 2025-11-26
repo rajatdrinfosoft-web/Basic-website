@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from .models import Package, Event, Page, Banner, FAQ, Testimonial, Query, db
 from .forms import ContactForm
 from . import cache
@@ -153,3 +153,7 @@ def privacy_policy():
     if page:
         return render_template('page.html', page=page)
     return render_template('page.html')
+
+@main.route('/.well-known/appspecific/com.chrome.devtools.json')
+def chrome_devtools_config():
+    return current_app.send_static_file('.well-known/appspecific/com.chrome.devtools.json')

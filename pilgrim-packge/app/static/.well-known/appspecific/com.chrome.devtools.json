@@ -1,1 +1,17 @@
-{}
+{
+  "name": "Pilgrim Packages",
+  "description": "Configuration for Chrome DevTools integration with PilgrimPackages.com",
+  "version": "1.0.0",
+  "contact": {
+    "email": "support@pilgrimpackages.com",
+    "phone": "+91-8282824999"
+  },
+  "features": {
+    "enableNetworkLogging": true,
+    "enablePerformanceTracing": true,
+    "enableCustomConsoleMessages": true
+  },
+  "endpoints": {
+    "contactForm": "https://www.pilgrimpackages.com/contact"
+  }
+}
