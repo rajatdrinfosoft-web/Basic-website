@@ -5,3 +5,5 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgresql://neondb_owner:npg_uYcyz7nM5Wqh@ep-shy-snow-adyq945n-pooler.c-2.us-east-1.aws.neon.tech/pilgrimpackages?sslmode=require&channel_binding=require')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CACHE_TYPE = 'simple'
+    DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
+    TESTING = os.environ.get('TESTING', 'False').lower() in ('true', '1', 'yes')
